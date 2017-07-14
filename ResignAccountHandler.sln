@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResignAccountHandlerUI", "ResignAccountHandlerUI\ResignAccountHandlerUI.csproj", "{3C6B2B10-37B3-4382-BC9A-B6C66E9B9A11}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResignAccountHandlerConsole", "ResignAccountHandlerConsole\ResignAccountHandlerConsole.csproj", "{624A7E22-BEF1-4EC9-9198-996E3F83A7C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{563512F5-AF99-40FB-A5CB-1C1D34538784}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3C6B2B10-37B3-4382-BC9A-B6C66E9B9A11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C6B2B10-37B3-4382-BC9A-B6C66E9B9A11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C6B2B10-37B3-4382-BC9A-B6C66E9B9A11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C6B2B10-37B3-4382-BC9A-B6C66E9B9A11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{624A7E22-BEF1-4EC9-9198-996E3F83A7C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{624A7E22-BEF1-4EC9-9198-996E3F83A7C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{624A7E22-BEF1-4EC9-9198-996E3F83A7C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{624A7E22-BEF1-4EC9-9198-996E3F83A7C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{563512F5-AF99-40FB-A5CB-1C1D34538784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{563512F5-AF99-40FB-A5CB-1C1D34538784}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{563512F5-AF99-40FB-A5CB-1C1D34538784}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{563512F5-AF99-40FB-A5CB-1C1D34538784}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		VisualSVNWorkingCopyRoot = .
+	EndGlobalSection
+EndGlobal
