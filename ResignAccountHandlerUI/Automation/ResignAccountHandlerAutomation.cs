@@ -4,10 +4,10 @@ using ResignAccountHandlerUI.AdExecutioner;
 using ResignAccountHandlerUI.Exceptions;
 using ResignAccountHandlerUI.Log;
 using ResignAccountHandlerUI.UIController;
+using ResignAccountHandlerUI.Logic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 
 namespace ResignAccountHandlerUI.Automation
@@ -53,7 +53,7 @@ namespace ResignAccountHandlerUI.Automation
 
         void EmailReport();
 
-        void ClearActionResults();
+        //void ClearActionResults();
     }
 
     /// <summary>
@@ -232,6 +232,7 @@ namespace ResignAccountHandlerUI.Automation
             UpdateResults.Sort((item1, item2) => (item1.Last().CompareTo(item2.Last())));
         }
 
+        //NYI: retry on reading, send fail
         public void Run()
         {
             if (IsCompleted) throw new InvalidOperationException("Automator already run, create new Automator");
@@ -248,12 +249,12 @@ namespace ResignAccountHandlerUI.Automation
         /// <summary>
         /// no real need to call this cuz program will auto terminate
         /// </summary>
-        public void ClearActionResults()
-        {
-            UpdateResults.Clear();
-            DisablesResults.Clear();
-            DeleteResults.Clear();
-        }
+        //public void ClearActionResults()
+        //{
+        //    UpdateResults.Clear();
+        //    DisablesResults.Clear();
+        //    DeleteResults.Clear();
+        //}
 
         public void EmailReport()
         {
@@ -264,10 +265,10 @@ namespace ResignAccountHandlerUI.Automation
         }
 
         private const string ReportSubject = "Resign Handler Report {0}";
-        private const string GreetingLine = "Dear all,</p><p>Report from resign handler as follow:";
+        private const string GreetingLine = "Dear all,</p><p>Report from resign handler as follows:";
         private const string SaluteLine = "Regards,";
 
-        private const string ReportUpdateGreeting = "<b>Reading resign forms result:</b>";
+        private const string ReportUpdateGreeting = "<b>Reading forms result:</b>";
         private readonly string[] UpdateResultHeader = new string[] { "Subject", "ReceiveDate", "Message", "Code" };
 
         private const string DisableGreeting = "<b>Account deactivation:</b>";
@@ -299,7 +300,7 @@ namespace ResignAccountHandlerUI.Automation
 
         private IEnumerable<MailboxAddress> ToAddress(IEnumerable<string> addresses)
         {
-            if (addresses == null) return null;
+            if (addresses == null || addresses.Count() < 1) return null;
             return addresses.Select(a => new MailboxAddress(a.Trim()));
         }
 

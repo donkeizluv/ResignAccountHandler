@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ResignAccountHandlerUI
+namespace ResignAccountHandlerUI.Logic
 {
     /// <summary>
     /// contains logic for how to delete, disable

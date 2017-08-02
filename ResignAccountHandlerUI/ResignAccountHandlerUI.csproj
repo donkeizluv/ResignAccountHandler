@@ -73,8 +73,8 @@
     <Compile Include="AdHelper\ADController.cs" />
     <Compile Include="Automation\AutomatorFactory.cs" />
     <Compile Include="Automation\HtmlComposer.cs" />
-    <Compile Include="Automation\SocketExtention.cs" />
-    <Compile Include="BussiessLogic.cs" />
+    <Compile Include="Automation\ReportComposer.cs" />
+    <Compile Include="Logic\BussiessLogic.cs" />
     <Compile Include="Exceptions\Exceptions.cs" />
     <Compile Include="AdExecutioner\Executioner.cs" />
     <Compile Include="Forms\FormCommitLog.cs">
@@ -190,6 +190,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="bugtrack.txt" />
     <Content Include="FodyWeavers.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

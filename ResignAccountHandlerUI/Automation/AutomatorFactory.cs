@@ -1,6 +1,7 @@
 ﻿using MimeKit;
 using ResignAccountHandlerUI.Adapter;
 using ResignAccountHandlerUI.AdExecutioner;
+using ResignAccountHandlerUI.Logic;
 using System;
 using System.Collections.Generic;
 using System.Linq;

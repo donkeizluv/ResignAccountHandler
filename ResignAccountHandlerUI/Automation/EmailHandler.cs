@@ -4,6 +4,7 @@ using MailKit.Net.Smtp;
 using MimeKit;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -43,8 +44,8 @@ namespace ResignAccountHandlerUI.Automation
             ProcessedFolderName = processedFolder;
         }
 
-        public virtual string Pop3MailServer { get; set; }
-        public virtual int Pop3Port { get; set; } = 995;
+        //public virtual string Pop3MailServer { get; set; }
+        //public virtual int Pop3Port { get; set; } = 995;
         public virtual string SmtpMailServer { get; set; } = "mail.hdsaison.com.vn";
         //public virtual string ImapMailServer { get; set; } = "prd-vn-mail05.sgvf.sgcf"; //faster than mail.hdsaison.com.vn
         public virtual string ImapMailServer { get; set; } = "mail.hdsaison.com.vn";
@@ -93,13 +94,13 @@ namespace ResignAccountHandlerUI.Automation
                 // The Inbox folder is always available on all IMAP servers...
                 //var folder = client.Inbox();
                 var resignFolder = GetFolder(client, ResignFolderName, CancellationToken.None) ??
-                    throw new NullReferenceException($"folder {ResignFolderName} not found");
+                    throw new NullReferenceException($"Folder {ResignFolderName} not found");
                 resignFolder.Open(FolderAccess.ReadWrite);
                 IMailFolder processedFolder = null;
                 if(MoveToProcessedFolder)
                 {
                     processedFolder = GetFolder(client, ProcessedFolderName, CancellationToken.None) ??
-                        throw new NullReferenceException($"folder {ProcessedFolderName} not found");
+                        throw new NullReferenceException($"Folder {ProcessedFolderName} not found");
                     //processedFolder.Open(FolderAccess.ReadWrite);
                 }
 
@@ -146,7 +147,8 @@ namespace ResignAccountHandlerUI.Automation
             //add recipients
             message.To.AddRange(recipients?? new List<MailboxAddress>());
             //add cc
-            message.Cc.AddRange(cc?? new List<MailboxAddress>());
+            if(cc != null || cc.Count() > 0)
+                message.Cc.AddRange(cc);
             //build body
             var bodyBuilder = new BodyBuilder()
             {
@@ -160,7 +162,7 @@ namespace ResignAccountHandlerUI.Automation
         {
             using (var client = new SmtpClient())
             {
-                // For demo-purposes, accept all SSL certificates (in case the server supports STARTTLS)
+                // For demo-purposes, accept all SSL certificates
                 client.Timeout = SmptpTimeout;
                 client.ServerCertificateValidationCallback = (s, c, h, e) => true;
                 client.Connect(SmtpMailServer, SmtpPort, false);
