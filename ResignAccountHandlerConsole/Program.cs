@@ -53,14 +53,15 @@ namespace ResignAccountHandlerConsole
                     //report
                     SendReport = nini.Configs["Report"].GetBoolean("SendReport"),
                     //email account
-                    SenderEmailSuffix = nini.Configs["EmailAccount"].GetString("SenderEmailSuffix"),
+                    //SenderEmailSuffix = nini.Configs["EmailAccount"].GetString("SenderEmailSuffix"),
                     EmailHandler = new EmailHandler(emailAuth.First(), emailAuth.Last()),
                     ResignFolderName = nini.Configs["EmailAccount"].GetString("ResignFolderName"),
                     ProcessedFolderName = nini.Configs["EmailAccount"].GetString("ProcessedFolderName"),
                     MoveToProcessedFolder = nini.Configs["EmailAccount"].GetBoolean("MoveToProcessedFolder"),
-                    ReportCC = nini.Configs["EmailAccount"].GetString("ReportCC").Split(','),
-                    ReportReceiver = nini.Configs["EmailAccount"].GetString("ReportReceiver").Split(','),
-
+                    ReadEmailRetry = nini.Configs["Retry"].GetInt("ReadEmailRetry"),
+                    ReportCC = nini.Configs["Report"].GetString("ReportCC").Split(','),
+                    ReportReceiver = nini.Configs["Report"].GetString("ReportReceiver").Split(','),
+                    SendReportRetry = nini.Configs["Retry"].GetInt("SendReportRetry"),
                     //exp: luu nhat hong:luu.nhat-hong@hdsaison.com.vn,vo ya phuong khanh:vo.phuong-khanh@hd... *case insenstive
                     AcceptedResignSenders = SplitToTuple(nini.Configs["EmailAccount"].GetString("AcceptedResignSenders")),
                     //db adapter
@@ -71,6 +72,12 @@ namespace ResignAccountHandlerConsole
                     //Policy
                     DeleteAfter = nini.Configs["Policy"].GetInt("DeleteAccountAfter")
                 };
+                var reportAuth = nini.Configs["Report"].GetString("Authentication");
+                if (!string.IsNullOrEmpty(reportAuth))
+                {
+                    config.EmailHandler.ReportSenderUsername = reportAuth.Split(':').First();
+                    config.EmailHandler.ReportSenderPassword = reportAuth.Split(':').Last();
+                }
                 return config;
             }
             catch (NullReferenceException)

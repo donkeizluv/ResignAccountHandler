@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Polly;
+using System.Net.Sockets;
 
 namespace ResignAccountHandlerUI.Automation
 {
@@ -27,6 +29,9 @@ namespace ResignAccountHandlerUI.Automation
 
         //string ProcessedFolderName { get; set; }
         //bool MoveToProcessedFolder { get; set; }
+
+        int ReadEmailRetry { get; set; }
+        int SendReportRetry { get; set; }
 
         IEnumerable<MailboxAddress> AcceptedSenders { get; set; }
         IEnumerable<string> ReportReceiver { get; set; }
@@ -47,7 +52,7 @@ namespace ResignAccountHandlerUI.Automation
         //void EmailDisableAccountsReport(); //should not expose this
         int DeleteAccounts();
 
-        void DoUpdate();
+        void DoUpdate(IEnumerable<MimeMessage> mailList);
 
         void Run();
 
@@ -91,7 +96,11 @@ namespace ResignAccountHandlerUI.Automation
 
         public List<List<string>> DisablesResults { get; private set; }
         public List<List<string>> DeleteResults { get; private set; }
-
+        public int ReadEmailRetry { get; set; }
+        public int SendReportRetry { get; set; }
+        private int _readEmailTries = 1;
+        private int _sendReportTries = 1;
+        private int _wait = 3;
         //better use factory to create this
         public ResignAccountHandlerAutomation()
         {
@@ -179,11 +188,9 @@ namespace ResignAccountHandlerUI.Automation
             return new List<string>(rowContent);
         }
 
-        public void DoUpdate()
+        public void DoUpdate(IEnumerable<MimeMessage> emailList)
         {
-            _logger.Log($"Begin reading folder: {ResignFolderName}");
             var extractor = new ResignInfoExtractor();
-            var emailList = EmailHandler.GetImapEmail(ResignFolderName, AcceptedSenders);
             _logger.Log($"Parsing - total emails: {emailList.Count()}");
             foreach (var email in emailList)
             {
@@ -236,12 +243,41 @@ namespace ResignAccountHandlerUI.Automation
         public void Run()
         {
             if (IsCompleted) throw new InvalidOperationException("Automator already run, create new Automator");
-            DoUpdate();
+            _logger.Log($"Begin reading folder: {ResignFolderName}");
+            var readEmailPol = Policy.Handle<SocketException>().WaitAndRetry(ReadEmailRetry, count =>
+            {
+                _logger.Log($"Read form failed -> wait {_wait}s then retry, retry left: {SendReportRetry - _readEmailTries}");
+                return TimeSpan.FromSeconds(_wait);
+            }, (ex, span) =>
+            {
+                if (_readEmailTries > ReadEmailRetry)
+                {
+                    throw ex;
+                }
+                _logger.Log($"Retry...");
+                _readEmailTries++;
+            });
+            var emailList = readEmailPol.Execute(() => EmailHandler.GetImapEmail(ResignFolderName, AcceptedSenders));
+            DoUpdate(emailList);
             DisableAccounts();
             DeleteAccounts();
             if (SendReport)
             {
-                EmailReport();
+                _logger.Log("Sending report...");
+                var sendReportPol = Policy.Handle<SocketException>().WaitAndRetry(SendReportRetry, count =>
+                {
+                    _logger.Log($"Send report failed -> wait {_wait}s then retry, retry left: {SendReportRetry - _sendReportTries}");
+                    return TimeSpan.FromSeconds(_wait);
+                }, (ex, span) =>
+                {
+                    if (_sendReportTries > SendReportRetry)
+                    {
+                        throw ex;
+                    }
+                    _logger.Log($"Retry...");
+                    _sendReportTries++;
+                });
+                sendReportPol.Execute(() => EmailReport());
             }
             IsCompleted = true;
         }
@@ -256,59 +292,18 @@ namespace ResignAccountHandlerUI.Automation
         //    DeleteResults.Clear();
         //}
 
+        private static readonly string ReportSubject = "Resign Handler Report {0}";
         public void EmailReport()
         {
-            _logger.Log("Sending report...");
             EmailHandler.SendEmail(ToAddress(ReportReceiver),
-                ToAddress(ReportCC), MakeReportBody(),
+                ToAddress(ReportCC), ReportComposer.MakeReportBody(UpdateResults, DisablesResults, DeleteResults),
                 string.Format(ReportSubject, DateTime.Today.ToString("dd/MM/yyyy")));
         }
-
-        private const string ReportSubject = "Resign Handler Report {0}";
-        private const string GreetingLine = "Dear all,</p><p>Report from resign handler as follows:";
-        private const string SaluteLine = "Regards,";
-
-        private const string ReportUpdateGreeting = "<b>Reading forms result:</b>";
-        private readonly string[] UpdateResultHeader = new string[] { "Subject", "ReceiveDate", "Message", "Code" };
-
-        private const string DisableGreeting = "<b>Account deactivation:</b>";
-        private readonly string[] DisableResultHeader = new string[] {"Index", "AD", "HR", "ReceiveDate", "ResignDay", "Message", "Code" };
-
-        private const string DeleteGreeting = "<b>Account deletion:</b>";
-
-        //DeleteResults.Add(MakeRow(resign.ADName, resign.HRCode, resign.ReceiveDate.ToString(), erorr, Code.I.ToString()));
-        private string MakeReportBody()
-        {
-            var htmlBodyBuilder = new StringBuilder();
-            htmlBodyBuilder.Append(HtmlComposer.ComposeOpening());
-
-            htmlBodyBuilder.Append(InsertPTag(GreetingLine));
-            //update report
-            htmlBodyBuilder.Append(InsertPTag(ReportUpdateGreeting));
-            htmlBodyBuilder.Append(HtmlComposer.ComposeTable(UpdateResults, UpdateResultHeader));
-            //disable report
-            htmlBodyBuilder.Append(InsertPTag(DisableGreeting));
-            htmlBodyBuilder.Append(HtmlComposer.ComposeTable(DisablesResults, DisableResultHeader));
-            //delete report
-            htmlBodyBuilder.Append(InsertPTag(DeleteGreeting));
-            htmlBodyBuilder.Append(HtmlComposer.ComposeTable(DeleteResults, DisableResultHeader));
-            //version
-            htmlBodyBuilder.Append(InsertPTag($"v{Program.Version}"));
-            htmlBodyBuilder.Append(HtmlComposer.ComposeClosing());
-            return htmlBodyBuilder.ToString();
-        }
-
         private IEnumerable<MailboxAddress> ToAddress(IEnumerable<string> addresses)
         {
             if (addresses == null || addresses.Count() < 1) return null;
             return addresses.Select(a => new MailboxAddress(a.Trim()));
         }
-
-        private string InsertPTag(string line)
-        {
-            return $"<p>{line}</p>";
-        }
-
         public void Dispose()
         {
             Adapter.Dispose();

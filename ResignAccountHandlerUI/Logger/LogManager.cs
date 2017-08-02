@@ -39,6 +39,7 @@ namespace ResignAccountHandlerUI.Log
         private static void WriteEx(Exception ex)
         {
             AppendLine(string.Format("### Exception ### {0:G}", DateTime.Now));
+            AppendLine(ex.GetType().ToString());
             Console.WriteLine(ex.Message);
             Console.WriteLine(ex.StackTrace);
             if (ex.InnerException != null)
@@ -54,6 +55,7 @@ namespace ResignAccountHandlerUI.Log
             if (ex.InnerException != null)
             {
                 AppendLine("Inner ex:");
+                AppendLine(ex.InnerException.GetType().ToString());
                 AppendLine(ex.InnerException.Message);
                 AppendLine(ex.InnerException.StackTrace);
             }

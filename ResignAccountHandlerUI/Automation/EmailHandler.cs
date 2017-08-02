@@ -17,8 +17,11 @@ namespace ResignAccountHandlerUI.Automation
         int ImapPort { get; set; }
         int SmtpPort { get; set; }
 
-        string Password { get; set; }
-        string Username { get; set; }
+        string FormReaderPassword { get; set; }
+        string FormReaderUsername { get; set; }
+        string ReportSenderPassword { get; set; }
+        string ReportSenderUsername { get; set; }
+
         string SenderEmailSuffix { get; set; }
         string ResignFolderName { get; set; }
         string ProcessedFolderName { get; set; }
@@ -33,13 +36,13 @@ namespace ResignAccountHandlerUI.Automation
     {
         public EmailHandler(string userName, string pwd)
         {
-            Username = userName;
-            Password = pwd;
+            FormReaderUsername = userName;
+            FormReaderPassword = pwd;
         }
         public EmailHandler(string userName, string pwd, bool moveProcessed, string processedFolder)
         {
-            Username = userName;
-            Password = pwd;
+            FormReaderUsername = userName;
+            FormReaderPassword = pwd;
             MoveToProcessedFolder = moveProcessed;
             ProcessedFolderName = processedFolder;
         }
@@ -53,19 +56,41 @@ namespace ResignAccountHandlerUI.Automation
         public virtual int SmptpTimeout { get; set; } = 1000 * 90;
         public virtual int ImapPort { get; set; } = 143; //993 for internet
         public virtual int SmtpPort { get; set; } = 25; //faster than 587
-        public string Password { get; set; }
-        public string Username { get; set; }
+        public string FormReaderPassword { get; set; }
+        public string FormReaderUsername { get; set; }
         public string SenderEmailSuffix { get; set; } = "@hdsaison.com.vn";
         public string ResignFolderName { get; set; }
         public string ProcessedFolderName { get; set; }
         public bool MoveToProcessedFolder { get; set; } = false;
-
-        //private Socket GetSocket(string server, int port)
-        //{
-        //    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        //    socket.Connect(server, port, TimeSpan.FromMilliseconds(ImapTimeout));
-        //    return socket;
-        //}
+        private string _reportPwd;
+        private string _reportUsername;
+        //use read account to send if report sender account is not set
+        public string ReportSenderPassword
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_reportPwd))
+                    return FormReaderPassword;
+                return _reportPwd;
+            }
+            set
+            {
+                _reportPwd = value;
+            }
+        }
+        public string ReportSenderUsername
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_reportUsername))
+                    return FormReaderUsername;
+                return _reportUsername;
+            }
+            set
+            {
+                _reportUsername = value;
+            }
+        }
 
         public IEnumerable<MimeMessage> GetImapEmail(string folderName, IEnumerable<MailboxAddress> acceptSenders)
         {
@@ -88,7 +113,7 @@ namespace ResignAccountHandlerUI.Automation
                 //client.Connect(socket, "mail.hdsaison.com.vn", 993);
 
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
-                client.Authenticate(Username, Password);
+                client.Authenticate(FormReaderUsername, FormReaderPassword);
 
 
                 // The Inbox folder is always available on all IMAP servers...
@@ -143,7 +168,7 @@ namespace ResignAccountHandlerUI.Automation
             var message = new MimeMessage();
             message.Subject = subject;
             //set From
-            message.From.Add(new MailboxAddress(Username + SenderEmailSuffix));
+            message.From.Add(new MailboxAddress(ReportSenderUsername + SenderEmailSuffix));
             //add recipients
             message.To.AddRange(recipients?? new List<MailboxAddress>());
             //add cc
@@ -168,7 +193,7 @@ namespace ResignAccountHandlerUI.Automation
                 client.Connect(SmtpMailServer, SmtpPort, false);
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
                 // Note: only needed if the SMTP server requires authentication
-                client.Authenticate(Username, Password);
+                client.Authenticate(ReportSenderUsername, ReportSenderPassword);
                 client.Send(email);
                 client.Disconnect(true);
             }

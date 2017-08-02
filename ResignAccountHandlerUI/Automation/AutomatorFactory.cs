@@ -11,7 +11,7 @@ namespace ResignAccountHandlerUI.Automation
     public class AutomatorConfig
     {
         public bool SendReport;
-        public string SenderEmailSuffix;
+        //public string SenderEmailSuffix;
         public string ResignFolderName;
         public string ProcessedFolderName;
         public bool MoveToProcessedFolder;
@@ -25,6 +25,9 @@ namespace ResignAccountHandlerUI.Automation
         public string[] ReportReceiver;
         public BussiessLogic Logic;
         public int DeleteAfter;
+        public int ReadEmailRetry;
+        public int SendReportRetry;
+
 
         public IEnumerable<MailboxAddress> GetAcceptedResignSenders()
         {
@@ -44,14 +47,16 @@ namespace ResignAccountHandlerUI.Automation
             var automator = new ResignAccountHandlerAutomation()
             {
                 SendReport = config.SendReport,
-                SenderEmailSuffix = config.SenderEmailSuffix,
+                //SenderEmailSuffix = config.SenderEmailSuffix,
                 ResignFolderName = config.ResignFolderName,
                 AcceptedSenders = config.GetAcceptedResignSenders(),
                 Adapter = new DbAdapter(GetDbPath()), //not configuarable
                 EmailHandler = config.EmailHandler,
                 Executioner = config.Executioner,
                 ReportCC = config.ReportCC,
-                ReportReceiver = config.ReportReceiver
+                ReportReceiver = config.ReportReceiver,
+                SendReportRetry = config.SendReportRetry,
+                ReadEmailRetry = config.ReadEmailRetry
             };
             automator.EmailHandler.MoveToProcessedFolder = config.MoveToProcessedFolder;
             automator.EmailHandler.ProcessedFolderName = config.ProcessedFolderName;
@@ -80,6 +85,8 @@ namespace ResignAccountHandlerUI.Automation
                 Executioner = new MockExecutioner(), //mock
                 ReportCC = new string[] { "luu.nhat-hong@hdsaison.com.vn" },
                 ReportReceiver = new string[] { "luu.nhat-hong@hdsaison.com.vn" },
+                ReadEmailRetry = 5,
+                SendReportRetry = 5
             };
             automator.EmailHandler.MoveToProcessedFolder = false;
             automator.Logic = new BussiessLogic(automator.Adapter, 10);

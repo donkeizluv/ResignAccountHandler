@@ -4,4 +4,4 @@ obj/
 Release/
 Res/
 packages/
-ConfigTemplate/
+ConfigTemplate/cred_config.ini
