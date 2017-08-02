@@ -1,9 +1,5 @@
 ﻿Bug:
-- occational timeout on sending report
-- Cc problem, error on sending when no Cc is specified
 
 
 
 NYI:
-- shorter error mess?
-- additional account to send report
