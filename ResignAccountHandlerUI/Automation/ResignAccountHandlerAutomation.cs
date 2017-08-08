@@ -209,19 +209,35 @@ namespace ResignAccountHandlerUI.Automation
                     switch (dbResult)
                     {
                         case DbResult.Insert:
-                            UpdateResults.Add(MakeRow(email.Subject, email.Date.DateTime.ToString(DateStringFormat), dbResult.ToString(), Code.I.ToString()));
+                            UpdateResults.Add(MakeRow(email.Subject, 
+                                email.Date.DateTime.ToString(DateStringFormat),
+                                resign.ResignDay.ToString(DateStringFormat),
+                                dbResult.ToString(), 
+                                Code.I.ToString()));
                             break;
 
                         case DbResult.Update: //update what?
-                            UpdateResults.Add(MakeRow(email.Subject, email.Date.DateTime.ToString(DateStringFormat), dbResult.ToString(), Code.I.ToString()));
+                            UpdateResults.Add(MakeRow(email.Subject, 
+                                email.Date.DateTime.ToString(DateStringFormat),
+                                resign.ResignDay.ToString(DateStringFormat),
+                                dbResult.ToString(), 
+                                Code.I.ToString()));
                             break;
 
                         case DbResult.Older:
-                            UpdateResults.Add(MakeRow(email.Subject, email.Date.DateTime.ToString(DateStringFormat), dbResult.ToString(), Code.I.ToString()));
+                            UpdateResults.Add(MakeRow(email.Subject, 
+                                email.Date.DateTime.ToString(DateStringFormat), 
+                                string.Empty,
+                                dbResult.ToString(), 
+                                Code.I.ToString()));
                             break;
 
                         case DbResult.Erorr:
-                            UpdateResults.Add(MakeRow(email.Subject, email.Date.DateTime.ToString(DateStringFormat), dbError, Code.E.ToString()));
+                            UpdateResults.Add(MakeRow(email.Subject, 
+                                email.Date.DateTime.ToString(DateStringFormat), 
+                                string.Empty,
+                                dbError, 
+                                Code.E.ToString()));
                             break;
 
                         default:

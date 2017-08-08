@@ -12,7 +12,7 @@ namespace ResignAccountHandlerUI.Automation
         private static readonly string SaluteLine = "Regards,";
 
         private static readonly string ReportUpdateGreeting = "<b>Reading forms result:</b>";
-        private static readonly string[] UpdateResultHeader = new string[] { "Subject", "ReceiveDate", "Message", "Code" };
+        private static readonly string[] UpdateResultHeader = new string[] { "Subject", "ReceiveDate", "ResignDay", "Message", "Code" };
 
         private static readonly string DisableGreeting = "<b>Account deactivation:</b>";
         private static readonly string[] DisableResultHeader = new string[] { "Index", "AD", "HR", "ReceiveDate", "ResignDay", "Message", "Code" };
