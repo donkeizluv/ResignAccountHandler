@@ -248,7 +248,7 @@ namespace ResignAccountHandlerUI.Automation
                 if (extractResult == ParseResult.Not_Resign_Email)
                 {
                     _logger.Log($"Parsing - probly not resign email: {email.Subject}");
-                    UpdateResults.Add(MakeRow(email.Subject, email.Date.DateTime.ToString(DateStringFormat), extractResult.ToString(), Code.I.ToString()));
+                    UpdateResults.Add(MakeRow(email.Subject, email.Date.DateTime.ToString(DateStringFormat), errorMess, Code.I.ToString()));
                 }
             }
             //sort base on error mess
