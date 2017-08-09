@@ -5,3 +5,4 @@ Release/
 Res/
 packages/
 **/cred_config.ini
+.idea/

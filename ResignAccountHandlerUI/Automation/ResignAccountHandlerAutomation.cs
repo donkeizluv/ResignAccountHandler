@@ -243,12 +243,12 @@ namespace ResignAccountHandlerUI.Automation
                         default:
                             throw new InvalidProgramException();
                     }
-                    _logger.Log($"Parsing - OK -> DB: {dbResult.ToString()}");
+                    _logger.Log($"Parsing - OK -> DB: {dbResult}");
                 }
                 if (extractResult == ParseResult.Not_Resign_Email)
                 {
                     _logger.Log($"Parsing - probly not resign email: {email.Subject}");
-                    UpdateResults.Add(MakeRow(email.Subject, email.Date.DateTime.ToString(DateStringFormat), errorMess, Code.I.ToString()));
+                    UpdateResults.Add(MakeRow(email.Subject, email.Date.DateTime.ToString(DateStringFormat), string.Empty, errorMess, Code.I.ToString()));
                 }
             }
             //sort base on error mess
@@ -293,7 +293,7 @@ namespace ResignAccountHandlerUI.Automation
                     _logger.Log($"Retry...");
                     _sendReportTries++;
                 });
-                sendReportPol.Execute(() => EmailReport());
+                sendReportPol.Execute(EmailReport);
             }
             IsCompleted = true;
         }
@@ -317,8 +317,9 @@ namespace ResignAccountHandlerUI.Automation
         }
         private IEnumerable<MailboxAddress> ToAddress(IEnumerable<string> addresses)
         {
-            if (addresses == null || addresses.Count() < 1) return null;
-            return addresses.Select(a => new MailboxAddress(a.Trim()));
+            var enumerable = addresses as string[] ?? addresses.ToArray();
+            if (addresses == null || !enumerable.Any()) return null;
+            return enumerable.Select(a => new MailboxAddress(a.Trim()));
         }
         public void Dispose()
         {

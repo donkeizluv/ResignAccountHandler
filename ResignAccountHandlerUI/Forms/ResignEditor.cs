@@ -9,10 +9,7 @@ namespace ResignAccountHandlerUI.Forms
 
         private Resignation CurrentResign
         {
-            get
-            {
-                return _currentResign;
-            }
+            get => _currentResign;
             set
             {
                 _currentResign = value;
