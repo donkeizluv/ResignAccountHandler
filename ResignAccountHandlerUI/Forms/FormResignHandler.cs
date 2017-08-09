@@ -133,5 +133,6 @@ namespace ResignAccountHandlerUI.Forms
             return MessageBox.Show(message,
                 "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
         }
+
     }
 }

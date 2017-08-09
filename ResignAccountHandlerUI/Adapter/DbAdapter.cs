@@ -31,6 +31,8 @@ namespace ResignAccountHandlerUI.Adapter
 
         IEnumerable<Resignation> GetRecords(RecordStatus status);
 
+        IEnumerable<Resignation> GetRecords(string fieldName, string value);
+
         bool FindByAdAndHr(string ad, out IEnumerable<Resignation> resigns);
 
         //bool FindDuplicateAdAndHr(string ad, out IEnumerable<Resignation> resigns);
@@ -73,6 +75,11 @@ namespace ResignAccountHandlerUI.Adapter
         public IEnumerable<Resignation> GetRecords(RecordStatus status)
         {
             return _db.GetCollection<Resignation>(ResignCollection).Find(Query.EQ("Status", status.ToString()));
+        }
+
+        public IEnumerable<Resignation> GetRecords(string field, string value)
+        {
+            return _db.GetCollection<Resignation>(ResignCollection).Find(Query.Contains(field, value));
         }
 
         private void AddNew(Resignation resign)
@@ -191,5 +198,7 @@ namespace ResignAccountHandlerUI.Adapter
         {
             return FindRecord(ad, out resigns);
         }
+
+
     }
 }
