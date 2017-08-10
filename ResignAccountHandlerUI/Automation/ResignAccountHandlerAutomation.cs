@@ -211,7 +211,7 @@ namespace ResignAccountHandlerUI.Automation
                 if (extractResult == ParseResult.Parsed_Info_Error)
                 {
                     //error
-                    _logger.Log($"Parsing - form error -> {errorMess}");
+                    _logger.Log($"Parsing - {email.Subject}: form error -> {errorMess}");
                     UpdateResults.Add(MakeRow(email.Subject, email.Date.DateTime.ToString(DateStringFormat), errorMess, Code.E.ToString()));
                     continue;
                 }
@@ -256,11 +256,11 @@ namespace ResignAccountHandlerUI.Automation
                         default:
                             throw new InvalidProgramException();
                     }
-                    _logger.Log($"Parsing - OK -> DB: {dbResult}");
+                    _logger.Log($"Parsing - {email.Subject}: OK -> DB: {dbError}");
                 }
                 if (extractResult == ParseResult.Not_Resign_Email)
                 {
-                    _logger.Log($"Parsing - probly not resign email: {email.Subject}");
+                    _logger.Log($"Parsing - {email.Subject}: probly not resign email");
                     UpdateResults.Add(MakeRow(email.Subject,
                         email.Date.DateTime.ToString(DateStringFormat), 
                         string.Empty,
