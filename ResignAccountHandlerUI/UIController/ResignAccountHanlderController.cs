@@ -67,7 +67,9 @@ namespace ResignAccountHandlerUI.UIController
 
         int DisplayTodayDeletes();
 
-        int DisplayQuery(RecordStatus? status);
+        int DisplayQuery(RecordStatus status);
+
+        int DisplayQuery(string ad);
 
         int DisableAccounts();
 
@@ -277,19 +279,34 @@ namespace ResignAccountHandlerUI.UIController
             Adapter.Dispose();
         }
 
-        private IEnumerable<Resignation> GetFilterdRecords(RecordStatus? status)
+        private IEnumerable<Resignation> GetFilterdRecords(RecordStatus status)
         {
-            if (status == null)
+            return Adapter.GetRecords(status);
+        }
+        private IEnumerable<Resignation> GetFilterdRecords(string ad)
+        {
+            if (ad == string.Empty)
             {
                 return Adapter.GetAllRecords();
             }
-            return Adapter.GetRecords(status ?? RecordStatus.Ready);
+            return Adapter.GetRecords("ADName", ad);
         }
 
-        public int DisplayQuery(RecordStatus? status)
+        public int DisplayQuery(RecordStatus status)
         {
             ClearDataGrid(Viewer.DataGridView_Query);
             var query = GetFilterdRecords(status);
+            foreach (var record in query)
+            {
+                Viewer.AddToQueryGrid(record);
+            }
+            return query.Count();
+        }
+
+        public int DisplayQuery(string ad)
+        {
+            ClearDataGrid(Viewer.DataGridView_Query);
+            var query = GetFilterdRecords(ad);
             foreach (var record in query)
             {
                 Viewer.AddToQueryGrid(record);

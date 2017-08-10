@@ -13,7 +13,6 @@ namespace ResignAccountHandlerUI.Forms
         public Color UpdateRowColor { get; set; } = Color.Cyan;
         public Color DeleteCellForeColor { get; set; } = Color.LightSalmon;
         public Color NewRowColor { get; set; } = Color.LightGreen;
-
         private FormCommitLog _formCommit = new FormCommitLog();
 
         private void ButtonFillQueryGrid_Click(object sender, EventArgs e)
@@ -25,13 +24,13 @@ namespace ResignAccountHandlerUI.Forms
             }
             ClearUncommitedChanges();
             ShowLoadingDialog(this);
-            if (checkBoxFilterStatus.Checked)
+            if (radioButtonFilterStatus.Checked)
             {
                 Controller.DisplayQuery((RecordStatus)Enum.Parse(typeof(RecordStatus), statusQueryComboBox.SelectedItem.ToString()));
             }
             else
             {
-                Controller.DisplayQuery(null);
+                Controller.DisplayQuery(textBoxFilterAd.Text);
             }
             HideLoadingDialog();
         }
@@ -244,6 +243,11 @@ namespace ResignAccountHandlerUI.Forms
         private bool IsRowDirty(DataGridViewRow row)
         {
             return _dirtyIndex.Contains(row.Index);
+        }
+        //tick ad radio
+        private void TextBoxFilterAd_TextChanged(object sender, EventArgs e)
+        {
+            radioButtonFilterAd.Checked = true;
         }
     }
 }
