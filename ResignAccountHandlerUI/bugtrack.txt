@@ -3,4 +3,4 @@
 
 
 NYI:
-- filter, search func in UI query
+- log report email as html to manually sent in case shit happen

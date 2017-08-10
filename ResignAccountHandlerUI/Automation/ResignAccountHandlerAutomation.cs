@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using Polly;
 using System.Net.Sockets;
+using MailKit.Security;
 
 namespace ResignAccountHandlerUI.Automation
 {
@@ -100,7 +101,7 @@ namespace ResignAccountHandlerUI.Automation
         public int SendReportRetry { get; set; }
         private int _readEmailTries = 1;
         private int _sendReportTries = 1;
-        private int _wait = 3;
+        private const int Wait = 3;
         //better use factory to create this
         public ResignAccountHandlerAutomation()
         {
@@ -128,7 +129,11 @@ namespace ResignAccountHandlerUI.Automation
                 {
                     resign.Status = RecordStatus.Disabled;
                     DisablesResults.Add(MakeRow(resign.Id.ToString(),
-                        resign.ADName, resign.HRCode, resign.ReceiveDate.ToString(DateStringFormat), resign.ResignDay.ToString(DateStringFormat), erorr, Code.I.ToString()));
+                        resign.ADName, resign.HRCode, 
+                        resign.ReceiveDate.ToString(DateStringFormat), 
+                        resign.ResignDay.ToString(DateStringFormat),
+                        erorr, 
+                        Code.I.ToString()));
                     if (!Adapter.UpdateRecord(resign, out var dbError))
                         throw new DbException(dbError);
                     _logger.Log($"Disable - OK: {resign.ADName}");
@@ -137,8 +142,11 @@ namespace ResignAccountHandlerUI.Automation
                 {
                     resign.Status = RecordStatus.Erorr;
                     DisablesResults.Add(MakeRow(resign.Id.ToString(),
-                        resign.ADName, resign.HRCode, resign.ReceiveDate.ToString(DateStringFormat), 
-                        resign.ResignDay.ToString(DateStringFormat), erorr, Code.E.ToString()));
+                        resign.ADName, 
+                        resign.HRCode, 
+                        resign.ReceiveDate.ToString(DateStringFormat), 
+                        resign.ResignDay.ToString(DateStringFormat), 
+                        erorr, Code.E.ToString()));
                     resign.AppendErrorMessage(erorr);
                     if (!Adapter.UpdateRecord(resign, out var dbError))
                         throw new DbException(dbError); //unlikely to happen
@@ -171,7 +179,12 @@ namespace ResignAccountHandlerUI.Automation
                 {
                     resign.Status = RecordStatus.Erorr;
                     DeleteResults.Add(MakeRow(resign.Id.ToString(),
-                        resign.ADName, resign.HRCode, resign.ReceiveDate.ToString(DateStringFormat), resign.ResignDay.ToString(DateStringFormat), erorr, Code.E.ToString()));
+                        resign.ADName, 
+                        resign.HRCode,
+                        resign.ReceiveDate.ToString(DateStringFormat),
+                        resign.ResignDay.ToString(DateStringFormat),
+                        erorr, 
+                        Code.E.ToString()));
                     resign.AppendErrorMessage(erorr);
                     if (!Adapter.UpdateRecord(resign, out var dbError))
                         throw new DbException(dbError); //unlikely to happen
@@ -248,7 +261,11 @@ namespace ResignAccountHandlerUI.Automation
                 if (extractResult == ParseResult.Not_Resign_Email)
                 {
                     _logger.Log($"Parsing - probly not resign email: {email.Subject}");
-                    UpdateResults.Add(MakeRow(email.Subject, email.Date.DateTime.ToString(DateStringFormat), string.Empty, errorMess, Code.I.ToString()));
+                    UpdateResults.Add(MakeRow(email.Subject,
+                        email.Date.DateTime.ToString(DateStringFormat), 
+                        string.Empty,
+                        errorMess,
+                        Code.I.ToString()));
                 }
             }
             //sort base on error mess
@@ -260,19 +277,21 @@ namespace ResignAccountHandlerUI.Automation
         {
             if (IsCompleted) throw new InvalidOperationException("Automator already run, create new Automator");
             _logger.Log($"Begin reading folder: {ResignFolderName}");
-            var readEmailPol = Policy.Handle<SocketException>().WaitAndRetry(ReadEmailRetry, count =>
-            {
-                _logger.Log($"Read form failed -> wait {_wait}s then retry, retry left: {SendReportRetry - _readEmailTries}");
-                return TimeSpan.FromSeconds(_wait);
-            }, (ex, span) =>
-            {
-                if (_readEmailTries > ReadEmailRetry)
+            var readEmailPol = Policy.
+                Handle<SocketException>().
+                WaitAndRetry(ReadEmailRetry, count =>
                 {
-                    throw ex;
-                }
-                _logger.Log($"Retry...");
-                _readEmailTries++;
-            });
+                    _logger.Log($"Read form failed -> wait {Wait}s then retry, retry left: {SendReportRetry - _readEmailTries}");
+                    return TimeSpan.FromSeconds(Wait);
+                }, (ex, span) =>
+                {
+                    if (_readEmailTries > ReadEmailRetry)
+                    {
+                        throw ex;
+                    }
+                    _logger.Log($"Retry...");
+                    _readEmailTries++;
+                });
             var emailList = readEmailPol.Execute(() => EmailHandler.GetImapEmail(ResignFolderName, AcceptedSenders));
             DoUpdate(emailList);
             DisableAccounts();
@@ -280,19 +299,23 @@ namespace ResignAccountHandlerUI.Automation
             if (SendReport)
             {
                 _logger.Log("Sending report...");
-                var sendReportPol = Policy.Handle<SocketException>().WaitAndRetry(SendReportRetry, count =>
-                {
-                    _logger.Log($"Send report failed -> wait {_wait}s then retry, retry left: {SendReportRetry - _sendReportTries}");
-                    return TimeSpan.FromSeconds(_wait);
-                }, (ex, span) =>
-                {
-                    if (_sendReportTries > SendReportRetry)
+                //so fucling socket ex is mutual
+                //but then there is Auth ex when cred is perfecly fine, WTF?
+                var sendReportPol = Policy.Handle<SocketException>().
+                    Or<AuthenticationException>().
+                    WaitAndRetry(SendReportRetry, count =>
                     {
-                        throw ex;
-                    }
-                    _logger.Log($"Retry...");
-                    _sendReportTries++;
-                });
+                        _logger.Log($"Send report failed -> wait {Wait}s then retry, retry left: {SendReportRetry - _sendReportTries}");
+                        return TimeSpan.FromSeconds(Wait);
+                    }, (ex, span) =>
+                    {
+                        if (_sendReportTries > SendReportRetry)
+                        {
+                            throw ex;
+                        }
+                        _logger.Log($"Retry...");
+                        _sendReportTries++;
+                    });
                 sendReportPol.Execute(EmailReport);
             }
             IsCompleted = true;
