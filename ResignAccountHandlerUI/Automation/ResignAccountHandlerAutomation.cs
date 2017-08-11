@@ -12,6 +12,8 @@ using System.Text;
 using Polly;
 using System.Net.Sockets;
 using MailKit.Security;
+using System.IO;
+using ResignAccountHandlerUI.Logger;
 
 namespace ResignAccountHandlerUI.Automation
 {
@@ -278,7 +280,8 @@ namespace ResignAccountHandlerUI.Automation
             if (IsCompleted) throw new InvalidOperationException("Automator already run, create new Automator");
             _logger.Log($"Begin reading folder: {ResignFolderName}");
             var readEmailPol = Policy.
-                Handle<SocketException>().
+                Handle<IOException>().
+                Or<SocketException>().
                 WaitAndRetry(ReadEmailRetry, count =>
                 {
                     _logger.Log($"Read form failed -> wait {Wait}s then retry, retry left: {SendReportRetry - _readEmailTries}");
@@ -334,8 +337,10 @@ namespace ResignAccountHandlerUI.Automation
         private static readonly string ReportSubject = "Resign Handler Report {0}";
         public void EmailReport()
         {
-            EmailHandler.SendEmail(ToAddress(ReportReceiver),
-                ToAddress(ReportCC), ReportComposer.MakeReportBody(UpdateResults, DisablesResults, DeleteResults),
+            string mailBody = ReportComposer.MakeReportBody(UpdateResults, DisablesResults, DeleteResults);
+            //uhm....new trick for datetime format?
+            LogManager.WriteOtherLog($"Report_{DateTime.Today:ddMMyyyy}.txt", mailBody);
+            EmailHandler.SendEmail(ToAddress(ReportReceiver),ToAddress(ReportCC), mailBody,
                 string.Format(ReportSubject, DateTime.Today.ToString("dd/MM/yyyy")));
         }
         private IEnumerable<MailboxAddress> ToAddress(IEnumerable<string> addresses)

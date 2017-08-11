@@ -20,21 +20,21 @@ namespace ResignAccountHandlerUI.Automation
         public static string MakeReportBody(List<List<string>> updateResult, List<List<string>> disableResult, List<List<string>> deleteResult)
         {
             var htmlBodyBuilder = new StringBuilder();
-            htmlBodyBuilder.Append(HtmlComposer.ComposeOpening());
+            htmlBodyBuilder.AppendLine(HtmlComposer.ComposeOpening());
 
-            htmlBodyBuilder.Append(InsertPTag(GreetingLine));
+            htmlBodyBuilder.AppendLine(InsertPTag(GreetingLine));
             //update report
-            htmlBodyBuilder.Append(InsertPTag(ReportUpdateGreeting));
-            htmlBodyBuilder.Append(HtmlComposer.ComposeTable(updateResult, UpdateResultHeader));
+            htmlBodyBuilder.AppendLine(InsertPTag(ReportUpdateGreeting));
+            htmlBodyBuilder.AppendLine(HtmlComposer.ComposeTable(updateResult, UpdateResultHeader));
             //disable report
-            htmlBodyBuilder.Append(InsertPTag(DisableGreeting));
-            htmlBodyBuilder.Append(HtmlComposer.ComposeTable(disableResult, DisableResultHeader));
+            htmlBodyBuilder.AppendLine(InsertPTag(DisableGreeting));
+            htmlBodyBuilder.AppendLine(HtmlComposer.ComposeTable(disableResult, DisableResultHeader));
             //delete report
-            htmlBodyBuilder.Append(InsertPTag(DeleteGreeting));
-            htmlBodyBuilder.Append(HtmlComposer.ComposeTable(deleteResult, DisableResultHeader));
+            htmlBodyBuilder.AppendLine(InsertPTag(DeleteGreeting));
+            htmlBodyBuilder.AppendLine(HtmlComposer.ComposeTable(deleteResult, DisableResultHeader));
             //version
-            htmlBodyBuilder.Append(InsertPTag($"v{Program.Version}"));
-            htmlBodyBuilder.Append(HtmlComposer.ComposeClosing());
+            htmlBodyBuilder.AppendLine(InsertPTag($"v{Program.Version}"));
+            htmlBodyBuilder.AppendLine(HtmlComposer.ComposeClosing());
             return htmlBodyBuilder.ToString();
         }
         private static string InsertPTag(string line)

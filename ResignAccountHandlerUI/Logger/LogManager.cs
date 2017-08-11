@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using ResignAccountHandlerUI.Logger;
 
 namespace ResignAccountHandlerUI.Log
 {
     public static class LogManager
     {
         private const string LogFileName = "log.txt";
+        private const string OtherLogFolder = "Reports";
         private static readonly List<ILogger> ListLogger = new List<ILogger>();
         public static bool WriteToFile { get; set; } = true;
         private static string LogPath => string.Format(@"{0}\{1}", Program.AssemblyDirectory, LogFileName);
-
+        
         public static ILogger GetLogger(Type t)
         {
             var logger = new SimpleLogger(t);
@@ -28,6 +30,14 @@ namespace ResignAccountHandlerUI.Log
             }
             if (e.Log == string.Empty) return;
             WriteLog(e.Log);
+        }
+
+        public static void WriteOtherLog(string fileName, string content)
+        {
+            string fullFilename = string.Format(@"{0}\{1}\{2}", Program.AssemblyDirectory, OtherLogFolder, fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(fullFilename));
+            File.AppendAllText(Path.GetFullPath(fullFilename),
+                content, Encoding.UTF8);
         }
 
         private static void WriteLog(string log)

@@ -165,14 +165,13 @@ namespace ResignAccountHandlerUI.Automation
 
         public void SendEmail(IEnumerable<MailboxAddress> recipients, IEnumerable<MailboxAddress> cc, string htmlBody, string subject)
         {
-            var message = new MimeMessage();
-            message.Subject = subject;
+            var message = new MimeMessage {Subject = subject};
             //set From
             message.From.Add(new MailboxAddress(ReportSenderUsername + SenderEmailSuffix));
             //add recipients
             message.To.AddRange(recipients?? new List<MailboxAddress>());
             //add cc
-            if(cc != null || cc.Count() > 0)
+            if(cc.Any())
                 message.Cc.AddRange(cc);
             //build body
             var bodyBuilder = new BodyBuilder()
