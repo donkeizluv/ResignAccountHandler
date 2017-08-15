@@ -24,32 +24,29 @@ namespace Test
 
 
 
-            //var exchangePs = new ExchangePowershellWrapper();
-            //Console.WriteLine("Enter ad to delete: ");
-            //var adName = Console.ReadLine();
-            //Console.WriteLine($"ad to be deleted: {adName}");
-            //Console.WriteLine("Enter to continue.");
-            //Console.ReadLine();
-            //try
-            //{
-            //    var result = exchangePs.RemoveMailboxAndAd2(adName);
-            //    foreach (var line in result)
-            //    {
-            //        Console.WriteLine(line.ToString());
-            //    }
-            //    Console.WriteLine("Done!");
-            //    Console.ReadLine();
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine(ex.Message);
-            //    Console.WriteLine(ex.StackTrace);
+            var exchangePs = new ExchangePowershellWrapper();
+            Console.WriteLine("Enter to continue!");
+            Console.ReadLine();
+            try
+            {
+                var result = exchangePs.SetAutoReply("helpdesk.handler", "i am auto for auto is i");
+                foreach (var line in result)
+                {
+                    Console.WriteLine(line.ToString());
+                }
+                Console.WriteLine("Done!");
+                Console.ReadLine();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
 
-            //    Console.ReadLine();
-            //}
-            
+                Console.ReadLine();
+            }
 
-           
+
+
 
         }
     }

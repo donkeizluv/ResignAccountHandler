@@ -214,7 +214,11 @@ namespace ResignAccountHandlerUI.Automation
                 {
                     //error
                     _logger.Log($"Parsing - {email.Subject}: form error -> {errorMess}");
-                    UpdateResults.Add(MakeRow(email.Subject, email.Date.DateTime.ToString(DateStringFormat), errorMess, Code.E.ToString()));
+                    UpdateResults.Add(MakeRow(email.Subject,
+                        email.Date.DateTime.ToString(DateStringFormat), 
+                        string.Empty,
+                        errorMess, 
+                        Code.E.ToString()));
                     continue;
                 }
                 if (extractResult == ParseResult.OK)
