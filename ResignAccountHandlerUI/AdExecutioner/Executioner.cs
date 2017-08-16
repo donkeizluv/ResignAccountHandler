@@ -1,6 +1,7 @@
 ﻿using ResignAccountHandlerUI.AdHelper;
 using System;
 using System.DirectoryServices;
+using ResignAccountHandlerUI.Model;
 
 namespace ResignAccountHandlerUI.AdExecutioner
 {

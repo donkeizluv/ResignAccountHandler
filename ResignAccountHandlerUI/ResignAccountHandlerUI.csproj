@@ -123,6 +123,7 @@
     <Compile Include="Automation\EmailHandler.cs" />
     <Compile Include="Logger\LogManager.cs" />
     <Compile Include="Logger\SimpleLogger.cs" />
+    <Compile Include="Model\Resignation.cs" />
     <Compile Include="OutlookHelper\OutlookWrapper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Adapter\DbAdapter.cs" />

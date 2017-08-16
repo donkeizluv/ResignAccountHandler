@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using ResignAccountHandlerUI.Model;
 
 namespace ResignAccountHandlerUI.UIController
 {
@@ -15,7 +16,6 @@ namespace ResignAccountHandlerUI.UIController
     {
         I, //infomation
         E, //error
-        O //ok
     }
 
     public enum DbAction
