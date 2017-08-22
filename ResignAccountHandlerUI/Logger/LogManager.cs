@@ -51,6 +51,7 @@ namespace ResignAccountHandlerUI.Log
         }
         private static void WriteEx(Exception ex)
         {
+            if (ex == null) return;
             AppendLine(string.Format("### Exception ### {0:G}", DateTime.Now));
             AppendLine(ex.GetType().ToString());
             Console.WriteLine(ex.Message);

@@ -41,8 +41,8 @@ namespace ResignAccountHandlerUI.Logger
 
         public void Log(Exception ex)
         {
+            if (ex == null) return;
             RaiseNewLogEvent(ex);
-
         }
 
         private void RaiseNewLogEvent(string log)

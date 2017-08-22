@@ -1,6 +1,8 @@
 ﻿using ResignAccountHandlerUI.AdHelper;
 using System;
+using System.Collections.ObjectModel;
 using System.DirectoryServices;
+using System.Management.Automation;
 using ResignAccountHandlerUI.Automation;
 using ResignAccountHandlerUI.Log;
 using ResignAccountHandlerUI.Logger;
@@ -108,6 +110,7 @@ namespace ResignAccountHandlerUI.AdExecutioner
                 resign.ResignDay.ToShortDateString()),
                 out string setDescriptionError);
             //set auto reply
+            //alias allows @...
             if(!SetAutoReply(resign.ADName, out var ex))
             {
                 _logger.Log("Set mail box auto reply failed.");
@@ -117,10 +120,24 @@ namespace ResignAccountHandlerUI.AdExecutioner
         }
         private bool SetAutoReply(string alias, out Exception ex)
         {
+            ex = null;
             try
             {
-                _psWrapper.GetAutoReplyPipe_V1(alias, AutoReplyString);
-                ex = null;
+                var pipe = _psWrapper.GetAutoReplyPipe_V1(alias, AutoReplyString);
+                var results = pipe.Invoke();
+                if (pipe.Error.Count > 0) //check if executed OK
+                {
+                    var error = pipe.Error.Read() as Collection<ErrorRecord>;
+                    if (error != null)
+                    {
+                        foreach (var er in error)
+                        {
+                           _logger.Log("[PowerShell]: Error in cmdlet: \n" + er.Exception.Message);
+                        }
+                        return false;
+                    }
+                }
+                //OK
                 return true;
             }
             catch (Exception e)
