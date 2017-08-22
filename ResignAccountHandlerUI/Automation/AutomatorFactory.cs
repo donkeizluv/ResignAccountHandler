@@ -16,7 +16,9 @@ namespace ResignAccountHandlerUI.Automation
         public string ProcessedFolderName;
         public bool MoveToProcessedFolder;
         public IEnumerable<Tuple<string, string>> AcceptedResignSenders;
-
+        //set mailbox auto reply
+        public string AutoReplyString { get; set; }
+        public bool SetMailBoxAutoReply { get; set; }
         //public IDbAdapter Adapter;
         public IEmailHandler EmailHandler;
 
@@ -56,7 +58,7 @@ namespace ResignAccountHandlerUI.Automation
                 ReportCC = config.ReportCC,
                 ReportReceiver = config.ReportReceiver,
                 SendReportRetry = config.SendReportRetry,
-                ReadEmailRetry = config.ReadEmailRetry
+                ReadEmailRetry = config.ReadEmailRetry,
             };
             automator.EmailHandler.MoveToProcessedFolder = config.MoveToProcessedFolder;
             automator.EmailHandler.ProcessedFolderName = config.ProcessedFolderName;

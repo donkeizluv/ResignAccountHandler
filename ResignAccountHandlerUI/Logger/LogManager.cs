@@ -28,8 +28,11 @@ namespace ResignAccountHandlerUI.Log
             {
                 WriteEx(e.Ex);
             }
-            if (e.Log == string.Empty) return;
-            WriteLog(e.Log);
+            if (!string.IsNullOrEmpty(e.Log))
+            {
+                WriteLog(e.Log);
+            }
+
         }
 
         public static void WriteOtherLog(string fileName, string content)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace ResignAccountHandlerUI.Automation
@@ -39,7 +40,7 @@ namespace ResignAccountHandlerUI.Automation
         }
         private static string InsertPTag(string line)
         {
-            return $"<p>{line}</p>";
+            return $"<p>{line}</p>{Environment.NewLine}";
         }
 
     }

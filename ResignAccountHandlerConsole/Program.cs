@@ -32,7 +32,7 @@ namespace ResignAccountHandlerConsole
             }
             catch (Exception ex) //be more specific
             {
-                _logger.Log(ex);
+                _logger.Log(ex); //logger handles inner ex
                 unhandleEx = true;
                 //Console.ReadLine(); //cmt this when run
             }
@@ -49,6 +49,11 @@ namespace ResignAccountHandlerConsole
                 var nini = new IniConfigSource($@"{AssemblyDirectory}\{ConfigFileName}");
                 var emailAuth = nini.Configs["EmailAccount"].GetString("Authentication").Split(':');
                 var executioner = nini.Configs["Executioner"].GetString("Authentication");
+                //set mailbox auto reply
+                var setMailBoxAutoReply = nini.Configs["MailBoxAutoReply"].GetBoolean("SetMailBoxAutoReply");
+                var autoReplyString = nini.Configs["MailBoxAutoReply"].GetString("AutoReplyString");
+                
+
                 var config = new AutomatorConfig()
                 {
                     //report
@@ -63,6 +68,7 @@ namespace ResignAccountHandlerConsole
                     ReportCC = nini.Configs["Report"].GetString("ReportCC").Split(','),
                     ReportReceiver = nini.Configs["Report"].GetString("ReportReceiver").Split(','),
                     SendReportRetry = nini.Configs["Retry"].GetInt("SendReportRetry"),
+
                     //exp: luu nhat hong:luu.nhat-hong@hdsaison.com.vn,vo ya phuong khanh:vo.phuong-khanh@hd... *case insenstive
                     AcceptedResignSenders = SplitToTuple(nini.Configs["EmailAccount"].GetString("AcceptedResignSenders")),
                     //db adapter
@@ -73,6 +79,16 @@ namespace ResignAccountHandlerConsole
                     //Policy
                     DeleteAfter = nini.Configs["Policy"].GetInt("DeleteAccountAfter")
                 };
+                //set auto reply flag & content to Executioner
+                if (setMailBoxAutoReply)
+                {
+                    if(string.IsNullOrEmpty(autoReplyString))
+                        throw new ArgumentException("auto reply string must be set.");
+
+                    config.Executioner.SetMailBoxAutoReply = true;
+                    config.Executioner.AutoReplyString = autoReplyString;
+                }
+                //set report sender account
                 var reportAuth = nini.Configs["Report"].GetString("Authentication");
                 if (!string.IsNullOrEmpty(reportAuth))
                 {
@@ -83,6 +99,7 @@ namespace ResignAccountHandlerConsole
             }
             catch (NullReferenceException)
             {
+                //wrap exception
                 Console.WriteLine("invalid config!");
                 Console.ReadLine();
                 throw new ArgumentException("invalid config");

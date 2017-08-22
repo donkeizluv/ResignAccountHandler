@@ -14,6 +14,7 @@ namespace ResignAccountHandlerUI.AdExecutioner
         {
         }
 
+        public bool SetMailBoxAutoReply { get; set; }
         public AdController Ad { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public bool DeleteAccount(Resignation resign, out string errorMess)
@@ -37,6 +38,8 @@ namespace ResignAccountHandlerUI.AdExecutioner
         {
             return false;
         }
+
+        public string AutoReplyString { get; set; }
 
         public bool DeleteAccountAndMailbox(Resignation resign, out string errorMess)
         {

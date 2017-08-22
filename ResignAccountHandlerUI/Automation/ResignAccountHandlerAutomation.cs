@@ -27,7 +27,7 @@ namespace ResignAccountHandlerUI.Automation
         //string Username { get; set; } //authenticate to receive/send email
         //string Password { get; set; }
         string SenderEmailSuffix { get; set; }
-
+        
         string ResignFolderName { get; set; }
 
         //string ProcessedFolderName { get; set; }
@@ -80,7 +80,7 @@ namespace ResignAccountHandlerUI.Automation
         //public string Username { get; set; } //authenticate to receive/send email
         //public string Password { get; set; }
         public string SenderEmailSuffix { get; set; }
-
+        
         public string ResignFolderName { get; set; }
         //public string ProcessedFolderName { get; set; }
         //public bool MoveToProcessedFolder { get; set; }

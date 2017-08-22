@@ -49,6 +49,7 @@ namespace Test
         //doesnt work
         public PowerShell GetAutoReplyPipe_V2(string alias, string content)
         {
+            throw new NotImplementedException();
             var psExec = PowerShell.Create();
             psExec.Runspace = GetExchangeRunspace(Username, Password);
             var builder = new StringBuilder();

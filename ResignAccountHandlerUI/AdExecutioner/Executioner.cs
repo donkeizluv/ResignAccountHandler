@@ -1,6 +1,9 @@
 ﻿using ResignAccountHandlerUI.AdHelper;
 using System;
 using System.DirectoryServices;
+using ResignAccountHandlerUI.Automation;
+using ResignAccountHandlerUI.Log;
+using ResignAccountHandlerUI.Logger;
 using ResignAccountHandlerUI.Model;
 
 namespace ResignAccountHandlerUI.AdExecutioner
@@ -15,13 +18,42 @@ namespace ResignAccountHandlerUI.AdExecutioner
 
         bool ContainsAutoToken(DirectoryEntry entry);
 
+        string AutoReplyString { get; set; }
+
+        bool SetMailBoxAutoReply { get; set; }
+
         AdController Ad { get; set; }
     }
 
     public class Executioner : IExecutioner
     {
+        private ExchangePowershellWrapper _psWrapper;
+        private string _autoReplyString = string.Empty;
+        public string AutoReplyString
+        {
+            get { return _autoReplyString; }
+            set { _autoReplyString = value; }
+        }
+
+        public string Username { get; set; }
+        public string Password { get; set; }
+        private bool _setMailBoxAutoReply;
+        public bool SetMailBoxAutoReply
+        {
+            get => _setMailBoxAutoReply;
+            set
+            {
+                _setMailBoxAutoReply = value;
+                if(_setMailBoxAutoReply)
+                {
+                    _psWrapper = new ExchangePowershellWrapper(Username, Password);
+                }
+            }
+        }
+
         public const string AutoToken = "[auto_resign_token]"; //mark for delete, if account is not mark then -> token erorr
         public AdController Ad { get; set; }
+        private ILogger _logger = LogManager.GetLogger(typeof(ResignAccountHandlerAutomation));
 
         public Executioner(string adm, string pwd)
         {
@@ -29,6 +61,8 @@ namespace ResignAccountHandlerUI.AdExecutioner
             {
                 //login
                 Ad = new AdController(adm, pwd);
+                Username = adm;
+                Password = pwd;
             }
             catch (UnauthorizedAccessException)
             {
@@ -68,12 +102,32 @@ namespace ResignAccountHandlerUI.AdExecutioner
                 return false;
             }
             //put info, token to description
-            var description = Ad.GetProperty(entry, "description");
+            string description = Ad.GetProperty(entry, "description");
             Ad.SetProperty(entry, "description", string.Format("{0} {1} disable date: {2}", 
                 description, AutoToken, 
                 resign.ResignDay.ToShortDateString()),
-                out string error);
+                out string setDescriptionError);
+            //set auto reply
+            if(!SetAutoReply(resign.ADName, out var ex))
+            {
+                _logger.Log("Set mail box auto reply failed.");
+                _logger.Log(ex);
+            }
             return Ad.DisableUserAccount(entry, out errorMess);
+        }
+        private bool SetAutoReply(string alias, out Exception ex)
+        {
+            try
+            {
+                _psWrapper.GetAutoReplyPipe_V1(alias, AutoReplyString);
+                ex = null;
+                return true;
+            }
+            catch (Exception e)
+            {
+                ex = e;
+                return false;
+            }
         }
         public bool DeleteAccountAndMailbox(Resignation resign, out string errorMess)
         {
