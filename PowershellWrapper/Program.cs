@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
+using System.Management.Automation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,30 +12,26 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            //var datetimeText = "23/04/2017";
-            //DateTime.TryParseExact(datetimeText.Replace(@"//", @"/"),
-            //"dd/MM/yyyy",
-            //CultureInfo.InvariantCulture,
-            //DateTimeStyles.None,
-            //out var resignDate);
-
-
-            //Console.WriteLine((DateTime.Today - resignDate).TotalDays.ToString());
-            //Console.ReadLine();
-
-
-
-            var exchangePs = new ExchangePowershellWrapper();
-            Console.WriteLine("Enter to continue!");
-            Console.ReadLine();
+            var exchangePs = new ExchangePowerShellWrapper("adm-hongln", "Dant@@760119");
+            Console.WriteLine("Enter username to enable AutoReply:");
+            var username = Console.ReadLine();
+            Console.WriteLine($"Attemp to set auto reply to {username}");
             try
             {
-                var result = exchangePs.SetAutoReply("helpdesk.handler", "i am auto for auto is i");
-                foreach (var line in result)
+                var pipe = exchangePs.GetAutoReplyPipe_V1(username, "bla bla bla");
+                var results = pipe.Invoke();
+                if (pipe.Error.Count > 0)
                 {
-                    Console.WriteLine(line.ToString());
+                    var error = pipe.Error.Read() as Collection<ErrorRecord>;
+                    if (error != null)
+                    {
+                        foreach (var er in error)
+                        {
+                            Console.WriteLine("[PowerShell]: Error in cmdlet: " + er.Exception.Message);
+                        }
+                    }
                 }
-                Console.WriteLine("Done!");
+                Console.WriteLine("done!");
                 Console.ReadLine();
             }
             catch (Exception ex)
@@ -42,11 +39,13 @@ namespace Test
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
 
+                if(ex.InnerException != null)
+                {
+                    Console.WriteLine(ex.InnerException.Message);
+                    Console.WriteLine(ex.InnerException.StackTrace);
+                }
                 Console.ReadLine();
             }
-
-
-
 
         }
     }

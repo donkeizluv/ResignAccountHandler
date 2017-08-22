@@ -69,7 +69,9 @@ namespace ResignAccountHandlerUI.AdExecutioner
             }
             //put info, token to description
             var description = Ad.GetProperty(entry, "description");
-            Ad.SetProperty(entry, "description", string.Format("{0} {1} disable date: {2}", description, AutoToken, resign.ResignDay.ToShortDateString()),
+            Ad.SetProperty(entry, "description", string.Format("{0} {1} disable date: {2}", 
+                description, AutoToken, 
+                resign.ResignDay.ToShortDateString()),
                 out string error);
             return Ad.DisableUserAccount(entry, out errorMess);
         }

@@ -11,7 +11,6 @@ namespace ResignAccountHandlerUI.Model
         public DateTime ReceiveDate { get; set; } //set by ResignInfoExtractor
         public RecordStatus Status { get; set; } //undetermined
 
-        //public ErrorType ErrorCode { get; set; } //any
         public string ErrorMessage { get; private set; } //AppendErrorMessage method
         //public string Contact { get; set; }
         public void SetErrorMessage(string mess) //update purpose

@@ -81,6 +81,7 @@
     <Compile Include="Automation\AutomatorFactory.cs" />
     <Compile Include="Automation\HtmlComposer.cs" />
     <Compile Include="Automation\ReportComposer.cs" />
+    <Compile Include="Helper\Extention.cs" />
     <Compile Include="Logic\BussiessLogic.cs" />
     <Compile Include="Exceptions\Exceptions.cs" />
     <Compile Include="AdExecutioner\Executioner.cs" />

@@ -32,13 +32,6 @@ namespace ResignAccountHandlerUI
 		CancelCode = 4,
 		CancelResign = 8
 	}
-	public static class Extention
-	{
-		public static bool HasMoreThanOneFlag(this FormType t)
-		{
-			return (t & (t - 1)) != 0;
-		}
-	}
 
 
 	public class ResignInfoExtractor
