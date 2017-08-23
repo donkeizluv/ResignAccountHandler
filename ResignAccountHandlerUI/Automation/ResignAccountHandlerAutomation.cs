@@ -14,6 +14,7 @@ using System.Net.Sockets;
 using MailKit.Security;
 using System.IO;
 using ResignAccountHandlerUI.Logger;
+using Polly.Retry;
 
 namespace ResignAccountHandlerUI.Automation
 {
@@ -277,15 +278,13 @@ namespace ResignAccountHandlerUI.Automation
             //sort base on error mess
             UpdateResults.Sort((item1, item2) => (item1.Last().CompareTo(item2.Last())));
         }
-
-        //NYI: retry on reading, send fail
-        public void Run()
+#region Policies
+        private RetryPolicy GetReadMailFolderRetryPolicy()
         {
-            if (IsCompleted) throw new InvalidOperationException("Automator already run, create new Automator");
-            _logger.Log($"Begin reading folder: {ResignFolderName}");
-            var readEmailPol = Policy.
-                Handle<IOException>().
-                Or<SocketException>().
+            return Policy.
+                Handle<IOException>(). //server drop connection with inner SocketEx
+                Or<SocketException>(). //server unexpectedly drops connection
+                Or<AuthenticationException>(). //on rare occations it throws this ex even tho cred is correct
                 WaitAndRetry(ReadEmailRetry, count =>
                 {
                     _logger.Log($"Read form failed -> wait {Wait}s then retry, retry left: {SendReportRetry - _readEmailTries}");
@@ -299,6 +298,32 @@ namespace ResignAccountHandlerUI.Automation
                     _logger.Log($"Retry...");
                     _readEmailTries++;
                 });
+        }
+        private RetryPolicy GetSendReportRetryPolicy()
+        {
+            return Policy.Handle<IOException>(). //server unexpectedly drops connection
+                Or<SocketException>(). //server unexpectedly drops connection
+                Or<AuthenticationException>(). //happens even when cred is correct
+                WaitAndRetry(SendReportRetry, count =>
+                {
+                    _logger.Log($"Send report failed -> wait {Wait}s then retry, retry left: {SendReportRetry - _sendReportTries}");
+                    return TimeSpan.FromSeconds(Wait);
+                }, (ex, span) =>
+                {
+                    if (_sendReportTries > SendReportRetry)
+                    {
+                        throw ex;
+                    }
+                    _logger.Log($"Retry...");
+                    _sendReportTries++;
+                });
+        }
+#endregion
+        public void Run()
+        {
+            if (IsCompleted) throw new InvalidOperationException("Automator already run, create new Automator");
+            _logger.Log($"Begin reading folder: {ResignFolderName}");
+            var readEmailPol = GetReadMailFolderRetryPolicy();
             var emailList = readEmailPol.Execute(() => EmailHandler.GetImapEmail(ResignFolderName, AcceptedSenders));
             DoUpdate(emailList);
             DisableAccounts();
@@ -308,21 +333,7 @@ namespace ResignAccountHandlerUI.Automation
                 _logger.Log("Sending report...");
                 //so fucling socket ex is mutual
                 //but then there is Auth ex when cred is perfecly fine, WTF?
-                var sendReportPol = Policy.Handle<SocketException>().
-                    Or<AuthenticationException>().
-                    WaitAndRetry(SendReportRetry, count =>
-                    {
-                        _logger.Log($"Send report failed -> wait {Wait}s then retry, retry left: {SendReportRetry - _sendReportTries}");
-                        return TimeSpan.FromSeconds(Wait);
-                    }, (ex, span) =>
-                    {
-                        if (_sendReportTries > SendReportRetry)
-                        {
-                            throw ex;
-                        }
-                        _logger.Log($"Retry...");
-                        _sendReportTries++;
-                    });
+                var sendReportPol = GetSendReportRetryPolicy();
                 sendReportPol.Execute(EmailReport);
             }
             IsCompleted = true;
