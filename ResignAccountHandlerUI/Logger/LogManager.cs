@@ -52,18 +52,20 @@ namespace ResignAccountHandlerUI.Log
         private static void WriteEx(Exception ex)
         {
             if (ex == null) return;
-            AppendLine(string.Format("### Exception ### {0:G}", DateTime.Now));
-            AppendLine(ex.GetType().ToString());
+            Console.WriteLine("### Exception ### {0:G}", DateTime.Now);
+            Console.WriteLine(ex.GetType().ToString());
             Console.WriteLine(ex.Message);
             Console.WriteLine(ex.StackTrace);
             if (ex.InnerException != null)
             {
                 Console.WriteLine("Inner ex:");
+                Console.WriteLine(ex.InnerException.GetType().ToString());
                 Console.WriteLine(ex.InnerException.Message);
                 Console.WriteLine(ex.InnerException.StackTrace);
             }
             if (!WriteToFile) return;
             AppendLine(string.Format("### Exception ### {0:G}", DateTime.Now));
+            AppendLine(ex.GetType().ToString());
             AppendLine(ex.Message);
             AppendLine(ex.StackTrace);
             if (ex.InnerException != null)
