@@ -164,7 +164,7 @@ namespace ResignAccountHandlerUI.ResignExtractor
 
             //get resign date
             GetCellContent(tableNode, "ngày nghỉ việc:", true, out var resignDate);
-            if (string.IsNullOrEmpty(hrCode))
+            if (string.IsNullOrEmpty(resignDate))
                 throw new ArgumentException("Cant get RESIGN DATE");
             resign.ResignDay = ParseToDatetime(resignDate);
 
