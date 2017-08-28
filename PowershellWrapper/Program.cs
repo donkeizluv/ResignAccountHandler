@@ -18,7 +18,8 @@ namespace Test
             Console.WriteLine($"Attemp to set auto reply to {username}");
             try
             {
-                var pipe = exchangePs.GetAutoReplyPipe_V1(username, "bla bla bla");
+                var pipe = exchangePs.GetAutoReplyPipe_V1(username, 
+                    "Hiện tại tôi đã thôi việc, mọi yêu cầu/thắc mắc xin liên hệ đồng sự hoặc cấp trên của tôi. Xin cảm ơn.");
                 var results = pipe.Invoke();
                 if (pipe.Error.Count > 0)
                 {

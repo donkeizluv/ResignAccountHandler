@@ -13,28 +13,28 @@ namespace ResignAccountHandlerUI.Automation
         private static string BuildHeadersHtml(string[] header)
         {
             var builder = new StringBuilder();
-            builder.Append("<tr>");
+            builder.AppendLine("<tr>");
             for (int i = 0; i < header.Count(); i++)
             {
                 string val = header[i] ?? throw new ArgumentException($"column header at {i} is empty");
                 //if (val == string.Empty) continue; //should allow empty header
-                builder.Append(string.Format("<td><b>{0}</b></td>", val));
+                builder.AppendLine(string.Format("<td><b>{0}</b></td>", val));
             }
-            builder.Append("</tr>");
+            builder.AppendLine("</tr>");
             return builder.ToString();
         }
 
         public static string ComposeOpening()
         {
             var builder = new StringBuilder();
-            builder.Append("<html>").Append(HeadTag).Append("<body>");
+            builder.AppendLine("<html>").AppendLine(HeadTag).AppendLine("<body>");
             return builder.ToString();
         }
 
         public static string ComposeClosing()
         {
             var builder = new StringBuilder();
-            builder.Append("</body>").Append("</html>");
+            builder.AppendLine("</body>").AppendLine("</html>");
             return builder.ToString();
         }
 
@@ -43,26 +43,26 @@ namespace ResignAccountHandlerUI.Automation
             var builder = new StringBuilder();
             if (content.Count() < 1)
             {
-                builder.Append("<p>None.</p>");
+                builder.AppendLine("<p>None.</p>");
                 return builder.ToString();
             }
             //insert header
-            builder.Append("<table>");
-            builder.Append(BuildHeadersHtml(header));
+            builder.AppendLine("<table>");
+            builder.AppendLine(BuildHeadersHtml(header));
 
             //row iteration
             foreach (var row in content)
             {
-                builder.Append("<tr>");
+                builder.AppendLine("<tr>");
 
                 foreach (var rowContent in row)
                 {
-                    builder.Append(string.Format("<td>{0}</td>", rowContent));
+                    builder.AppendLine(string.Format("<td>{0}</td>", rowContent));
                 }
-                builder.Append("</tr>");
+                builder.AppendLine("</tr>");
             }
             //close table
-            builder.Append("</table>");
+            builder.AppendLine("</table>");
             return builder.ToString();
         }
     }

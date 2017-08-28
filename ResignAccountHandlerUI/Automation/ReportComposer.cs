@@ -40,7 +40,7 @@ namespace ResignAccountHandlerUI.Automation
         }
         private static string InsertPTag(string line)
         {
-            return $"<p>{line}</p>{Environment.NewLine}";
+            return $"<p>{line}</p>";
         }
 
     }

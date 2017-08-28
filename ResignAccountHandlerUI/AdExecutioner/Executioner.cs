@@ -132,7 +132,7 @@ namespace ResignAccountHandlerUI.AdExecutioner
                     {
                         foreach (var er in error)
                         {
-                           _logger.Log("[PowerShell]: Error in cmdlet: \n" + er.Exception.Message);
+                           _logger.Log($"[PowerShell Error]: {er.Exception.Message}");
                         }
                         return false;
                     }
