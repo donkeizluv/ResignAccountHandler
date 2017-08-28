@@ -15,6 +15,7 @@ using MailKit.Security;
 using System.IO;
 using ResignAccountHandlerUI.Logger;
 using Polly.Retry;
+using ResignAccountHandlerUI.ResignExtractor;
 
 namespace ResignAccountHandlerUI.Automation
 {

@@ -1,4 +1,5 @@
 ﻿using System.Security;
+using ResignAccountHandlerUI.ResignExtractor;
 
 namespace ResignAccountHandlerUI
 {

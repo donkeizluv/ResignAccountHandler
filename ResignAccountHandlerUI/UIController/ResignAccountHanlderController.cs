@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using ResignAccountHandlerUI.Model;
+using ResignAccountHandlerUI.ResignExtractor;
 
 namespace ResignAccountHandlerUI.UIController
 {

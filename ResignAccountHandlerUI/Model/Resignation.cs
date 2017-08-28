@@ -1,4 +1,5 @@
 ﻿using System;
+using ResignAccountHandlerUI.ResignExtractor;
 
 namespace ResignAccountHandlerUI.Model
 {

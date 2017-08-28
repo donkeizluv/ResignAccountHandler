@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using ResignAccountHandlerUI.Model;
+using ResignAccountHandlerUI.ResignExtractor;
 
 namespace ResignAccountHandlerUI.Forms
 {

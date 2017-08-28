@@ -1,11 +1,11 @@
-﻿using HtmlAgilityPack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using HtmlAgilityPack;
 using ResignAccountHandlerUI.Model;
 
-namespace ResignAccountHandlerUI
+namespace ResignAccountHandlerUI.ResignExtractor
 {
 	public enum RecordStatus
 	{
@@ -71,6 +71,12 @@ namespace ResignAccountHandlerUI
 			Seperators.Add(MailSeperatorImap);
 			Seperators.Add(MailSeperatorOutlook);
 		}
+        public string Test(HtmlDocument doc, string label)
+        {
+            GetTables(doc, out var node, RegcognizeTextCancelCode);
+            GetCellContent(node, label, true, out var innerText);
+            return innerText;
+        }
 		/// <summary>
 		/// false means content is not resign letter, null means cant parse for info -> see rawInfo
 		/// </summary>
@@ -142,51 +148,45 @@ namespace ResignAccountHandlerUI
 
 		}
 
-		//0,1: realname
-		//1,1: hrcode
-		//2,1: indus code
-		//3,1: email
-		//4,1: resign date
 		private bool ParseResign(HtmlNode tableNode, out Resignation resign)
 		{
-			resign = new Resignation();
-			if (GetTextFromCell(tableNode, 1, 1, out var hrCode))
-				resign.HRCode = hrCode;
-			else
-				throw new ArgumentException("Cant get hrCode");
-			//get email
-			if (GetTextFromCell(tableNode, 3, 1, out var ad))
-				resign.ADName = ad;
-			else
-				throw new ArgumentException("Cant get Ad");
-			//get resign date
-			if (GetTextFromCell(tableNode, 4, 1, out var resignDateText))
-			{
-                resign.ResignDay = ParseToDatetime(resignDateText);
-            }
-			else
-				throw new ArgumentException("Cant get resign date text.");
-			resign.Status = RecordStatus.Ready;
-			return true;
-		}
-	    //2,1: Hr code
-	    //3,1: email
+		    resign = new Resignation();
+		    //get HR CODE
+		    GetCellContent(tableNode, "hr code:", true, out var hrCode);
+		    if (string.IsNullOrEmpty(hrCode))
+		        throw new ArgumentException("Cant get HR CODE");
+		    resign.HRCode = hrCode;
+		    //get email
+		    GetCellContent(tableNode, "email:", true, out var ad);
+		    if (string.IsNullOrEmpty(ad))
+		        throw new ArgumentException("Cant get EMAIL");
+		    resign.ADName = ad;
+
+            //get resign date
+            GetCellContent(tableNode, "ngày nghỉ việc:", true, out var resignDate);
+            if (string.IsNullOrEmpty(hrCode))
+                throw new ArgumentException("Cant get RESIGN DATE");
+            resign.ResignDay = ParseToDatetime(resignDate);
+
+            resign.Status = RecordStatus.Ready;
+            return true;
+        }
+
 	    private bool ParseCancelResign(HtmlNode tableNode, out Resignation resign)
 	    {
 	        resign = new Resignation();
-	        //get hr code
-	        if (GetTextFromCell(tableNode, 2, 1, out var hrCode))
-	            resign.HRCode = hrCode;
-	        else
-	            throw new ArgumentException("Cant get hrCode");
+            //get HR CODE
+            GetCellContent(tableNode, "hr code:", true, out var hrCode);
+	        if (string.IsNullOrEmpty(hrCode))
+                throw new ArgumentException("Cant get HR CODE");
+	        resign.HRCode = hrCode;
+            //get email
+            GetCellContent(tableNode, "email:", true, out var ad);
+            if (string.IsNullOrEmpty(ad))
+                throw new ArgumentException("Cant get EMAIL");
+	        resign.ADName = ad;
 
-	        //get ad
-	        if (GetTextFromCell(tableNode, 3, 1, out var ad))
-	            resign.ADName = ad;
-	        else
-	            throw new ArgumentException("Cant get Ad");
-
-	        resign.ResignDay = System.Windows.Forms.DateTimePicker.MaximumDateTime;
+            resign.ResignDay = System.Windows.Forms.DateTimePicker.MaximumDateTime;
 	        resign.Status = RecordStatus.Canceled;
 	        return true;
 
@@ -197,19 +197,16 @@ namespace ResignAccountHandlerUI
 	    private bool ParseCancelCode(HtmlNode tableNode, out Resignation resign)
 	    {
 	        resign = new Resignation();
-	        //get hr code
-	        if (GetTextFromCell(tableNode, 2, 1, out var hrCode))
-	            resign.HRCode = hrCode;
-	        else
-	            throw new ArgumentException("Cant get hrCode");
+            //get HR CODE
+	        GetCellContent(tableNode, "hr code:", true, out var hrCode);
+            if (string.IsNullOrEmpty(hrCode)) throw new ArgumentException("Cant get HR CODE");
+	        resign.HRCode = hrCode;
+            //get email
+            GetCellContent(tableNode, "email:", true, out var ad);
+            if (string.IsNullOrEmpty(ad)) throw new ArgumentException("Cant get EMAIL");
+	        resign.ADName = ad;
 
-	        //get ad
-	        if (GetTextFromCell(tableNode, 3, 1, out var ad))
-	            resign.ADName = ad;
-	        else
-	            throw new ArgumentException("Cant get Ad");
-
-	        resign.Status = RecordStatus.Ready;
+            resign.Status = RecordStatus.Ready;
 	        resign.ResignDay = DateTime.Today;
 	        return true;
 	    }
@@ -239,30 +236,60 @@ namespace ResignAccountHandlerUI
 			return string.Join("/", split);
 		}
 		
-		//clean string here
-		private bool GetTextFromCell(HtmlNode tableNode, int rowIndex, int colIndex, out string innerText)
-		{
-			innerText = string.Empty;
-			try
-			{
-				var tr = tableNode.SelectNodes(".//tr")[rowIndex];
-				innerText = tr.SelectNodes(".//td")[colIndex].InnerText.Replace("&nbsp;", "").Trim();
-
-				return true;
-			}
-			catch (IndexOutOfRangeException)
-			{
-				return false;
-			}
-			catch (NullReferenceException)
-			{
-				return false;
-			}
-			catch(ArgumentOutOfRangeException)
-			{
-				return false;
-			}
-		}
+        private bool GetCellContent(HtmlNode tableNode, string label, bool caseInsensitive, out string innerText)
+        {
+            innerText = string.Empty;
+            var option = caseInsensitive ? 
+                StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
+            try
+            {
+                var trNodes = tableNode.SelectNodes(".//tr");
+                foreach (var row in trNodes)
+                {
+                    var tdNodes = row.SelectNodes(".//td");
+                    if (tdNodes == null || tdNodes.Count < 1) continue;
+                    foreach (var td in tdNodes)
+                    {
+                        if (CleanString(td.InnerText).IndexOf(CleanString(label), option) >= 0)
+                        {
+                            var nextNode = NextNonTextNode(td);
+                            if (nextNode == null) return false;
+                            innerText = CleanInnerText(nextNode.InnerText);
+                            return true;
+                        }
+                    }
+                }
+                return true;
+            }
+            catch (IndexOutOfRangeException)
+            {
+                return false;
+            }
+            catch (NullReferenceException)
+            {
+                return false;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return false;
+            }
+        }
+        //to recursion or not to recursion???
+        private HtmlNode NextNonTextNode(HtmlNode node)
+        {
+            var next = node.NextSibling;
+            if (next == null) return null;
+            if (next.NodeType != HtmlNodeType.Text) return next;
+            //get next non text
+            while (true)
+            {
+                next = next.NextSibling;
+                if (next == null) return null;
+                if (next.NodeType == HtmlNodeType.Text)
+                    continue;
+                return next;
+            }
+        }
 
 		//kind of unessesary, but lol i like flags
 		private FormType DetermindFormType(string html, out HtmlNode tableNode)
@@ -276,19 +303,19 @@ namespace ResignAccountHandlerUI
 			var doc = new HtmlDocument();
 			doc.LoadHtml(lastestEmailContent);
             //normal resign
-			if (FindRegconizeText(doc, out table, RegcognizeTextResignForm_1, RegcognizeTextResignForm_2))
+			if (GetTables(doc, out table, RegcognizeTextResignForm_1, RegcognizeTextResignForm_2))
 			{
 				formType |= FormType.Resign;
 				tableNode = table;
 			}
             //cancel job offer
-			if(FindRegconizeText(doc, out table, RegcognizeTextCancelCode))
+			if(GetTables(doc, out table, RegcognizeTextCancelCode))
 			{
 				formType |= FormType.CancelCode;
 				tableNode = table;
 			}
             //cancel resign
-			if(FindRegconizeText(doc, out table, RegcognizeTextCancelResign))
+			if(GetTables(doc, out table, RegcognizeTextCancelResign))
 			{
 				formType |= FormType.CancelResign;
 				tableNode = table;
@@ -323,6 +350,13 @@ namespace ResignAccountHandlerUI
 					throw new InvalidProgramException();
 			}
 		}
+        private string CleanInnerText(string s)
+        {
+            return s.Replace("&nbsp;", string.Empty).
+                Replace("\r\n", string.Empty).
+                Replace("\r", string.Empty).
+                Replace("\n", string.Empty).Trim();
+        }
 		private string CleanString(string s)
 		{
 			return s.Replace("\r\n", string.Empty).
@@ -344,12 +378,15 @@ namespace ResignAccountHandlerUI
 			}
 			return array.First();
 		}
+
 		private int TableRowCount(HtmlNode table)
 		{
 		    var tr = table?.SelectNodes(".//tr");
 			return tr?.Count ?? 0;
 		}
-		private bool FindRegconizeText(HtmlDocument doc, out HtmlNode tableNode, params string[] regz)
+
+        //NYI: suport multiple table?
+		private bool GetTables(HtmlDocument doc, out HtmlNode tableNode, params string[] regz)
 		{
 			tableNode = null;
 			var tables = doc.DocumentNode.SelectNodes(TablesXpath);
@@ -364,7 +401,6 @@ namespace ResignAccountHandlerUI
 					{
 						skipList.Add(reg);
 						contains++;
-
 					}
 				}
 				if (contains == regz.Count())
@@ -375,6 +411,7 @@ namespace ResignAccountHandlerUI
 			}
 			return false;
 		}
+
 		private static string[] SplitByString(string tobeSplitted, string splitter)
 		{
 			return tobeSplitted.Split(new[] { splitter }, StringSplitOptions.None);
