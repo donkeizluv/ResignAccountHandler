@@ -213,7 +213,7 @@ namespace ResignAccountHandlerUI.UIController
             {
                 //null = cant parse info
                 //false = no info table found -> not resign letter
-                var result = extractor.ExtractResignForm(mail.HTMLBody, mail.ReceivedTime, out var resign, out var errorMess);
+                var result = extractor.ExtractResignForm(mail.HTMLBody, out var resign, out var errorMess);
                 if (result == ParseResult.Parsed_Info_Error)
                 {
                     //error
@@ -225,6 +225,7 @@ namespace ResignAccountHandlerUI.UIController
                 {
                     //ok
                     //resignList.Add(resign);
+                    resign.ReceiveDate = mail.ReceivedTime;
                     var dbResult = Adapter.UpsertRecordIfNewer(resign, out var dbError);
 
                     switch (dbResult)

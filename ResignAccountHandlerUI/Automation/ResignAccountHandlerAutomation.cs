@@ -210,7 +210,7 @@ namespace ResignAccountHandlerUI.Automation
             _logger.Log($"Parsing - total emails: {emailList.Count()}");
             foreach (var email in emailList)
             {
-                var extractResult = extractor.ExtractResignForm(email.HtmlBody, email.Date.DateTime, out var resign, out var errorMess);
+                var extractResult = extractor.ExtractResignForm(email.HtmlBody, out var resign, out var errorMess);
                 if (extractResult == ParseResult.Parsed_Info_Error)
                 {
                     //error
@@ -220,12 +220,13 @@ namespace ResignAccountHandlerUI.Automation
                         string.Empty,
                         errorMess, 
                         Code.E.ToString()));
+                    //next email
                     continue;
                 }
                 if (extractResult == ParseResult.OK)
                 {
+                    resign.ReceiveDate = email.Date.DateTime;
                     var dbResult = Adapter.UpsertRecordIfNewer(resign, out var dbError);
-
                     switch (dbResult)
                     {
                         case DbResult.Insert:
@@ -236,7 +237,7 @@ namespace ResignAccountHandlerUI.Automation
                                 Code.I.ToString()));
                             break;
 
-                        case DbResult.Update: //update what?
+                        case DbResult.Update:
                             UpdateResults.Add(MakeRow(email.Subject, 
                                 email.Date.DateTime.ToString(DateStringFormat),
                                 resign.ResignDay.ToString(DateStringFormat),
@@ -252,7 +253,7 @@ namespace ResignAccountHandlerUI.Automation
                                 Code.I.ToString()));
                             break;
 
-                        case DbResult.Erorr:
+                        case DbResult.Erorr: //never seen this happens
                             UpdateResults.Add(MakeRow(email.Subject, 
                                 email.Date.DateTime.ToString(DateStringFormat), 
                                 string.Empty,
@@ -276,7 +277,7 @@ namespace ResignAccountHandlerUI.Automation
                 }
             }
             //sort base on error mess
-            UpdateResults.Sort((item1, item2) => (item1.Last().CompareTo(item2.Last())));
+            UpdateResults.Sort((item1, item2) => string.Compare(item1.Last(), item2.Last(), StringComparison.Ordinal));
         }
 #region Policies
         private RetryPolicy GetReadMailFolderRetryPolicy()

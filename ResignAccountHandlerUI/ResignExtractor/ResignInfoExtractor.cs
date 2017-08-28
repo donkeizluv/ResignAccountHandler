@@ -75,19 +75,16 @@ namespace ResignAccountHandlerUI
 		/// false means content is not resign letter, null means cant parse for info -> see rawInfo
 		/// </summary>
 		/// <param name="html"></param>
-		/// <param name="receiveDate"></param>
 		/// <param name="resign"></param>
 		/// <param name="rawInfo"></param>
 		/// <returns></returns>
-		public ParseResult ExtractResignForm(string html, DateTime receiveDate, out Resignation resign, out string errorMess)
+		public ParseResult ExtractResignForm(string html, out Resignation resign, out string errorMess)
 		{
-			
 			try
 			{
 				var t = DetermindFormType(html, out var tableNode);
 				if (ParseResignInfo(tableNode, t, out resign, out errorMess))
 				{
-					resign.ReceiveDate = receiveDate;
 					return ParseResult.OK;
 				}
 				else
@@ -165,30 +162,75 @@ namespace ResignAccountHandlerUI
 			//get resign date
 			if (GetTextFromCell(tableNode, 4, 1, out var resignDateText))
 			{
-				if (DateTime.TryParseExact(FixDateText(resignDateText),
-				@"dd/MM/yyyy",
-				CultureInfo.InvariantCulture,
-				DateTimeStyles.None,
-				out var resignDate))
-					resign.ResignDay = resignDate;
-				else
-					throw new ArgumentException("Cant parse resign text to Date.");
-			}
+                resign.ResignDay = ParseToDatetime(resignDateText);
+            }
 			else
 				throw new ArgumentException("Cant get resign date text.");
 			resign.Status = RecordStatus.Ready;
 			return true;
-
 		}
+	    //2,1: Hr code
+	    //3,1: email
+	    private bool ParseCancelResign(HtmlNode tableNode, out Resignation resign)
+	    {
+	        resign = new Resignation();
+	        //get hr code
+	        if (GetTextFromCell(tableNode, 2, 1, out var hrCode))
+	            resign.HRCode = hrCode;
+	        else
+	            throw new ArgumentException("Cant get hrCode");
+
+	        //get ad
+	        if (GetTextFromCell(tableNode, 3, 1, out var ad))
+	            resign.ADName = ad;
+	        else
+	            throw new ArgumentException("Cant get Ad");
+
+	        resign.ResignDay = System.Windows.Forms.DateTimePicker.MaximumDateTime;
+	        resign.Status = RecordStatus.Canceled;
+	        return true;
+
+	    }
+	    //pretty much the same with resign
+	    //2,1: Hr code
+	    //3,1: email
+	    private bool ParseCancelCode(HtmlNode tableNode, out Resignation resign)
+	    {
+	        resign = new Resignation();
+	        //get hr code
+	        if (GetTextFromCell(tableNode, 2, 1, out var hrCode))
+	            resign.HRCode = hrCode;
+	        else
+	            throw new ArgumentException("Cant get hrCode");
+
+	        //get ad
+	        if (GetTextFromCell(tableNode, 3, 1, out var ad))
+	            resign.ADName = ad;
+	        else
+	            throw new ArgumentException("Cant get Ad");
+
+	        resign.Status = RecordStatus.Ready;
+	        resign.ResignDay = DateTime.Today;
+	        return true;
+	    }
+
+        private static DateTime ParseToDatetime(string datetimeText)
+        {
+            if (DateTime.TryParseExact(FixDateText(datetimeText),
+                @"dd/MM/yyyy",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var resignDate))
+            {
+                return resignDate;
+            }
+            throw new ArgumentException("Cant parse resign text to Date.");
+        }
 		private static string FixDateText(string date)
 		{
 			string AddZero(string s)
 			{
-				if(s.Length < 2)
-				{
-					return string.Format("{0}{1}", "0", s);
-				}
-				return s;
+			    return s.Length < 2 ? $"0{s}" : s;
 			}
 			var split = date.Replace(@"//", @"/").Split('/');
 			if (split.Count() != 3) return date; //invalid
@@ -196,51 +238,7 @@ namespace ResignAccountHandlerUI
 			split[1] = AddZero(split[1]);
 			return string.Join("/", split);
 		}
-		//2,1: Hr code
-		//3,1: email
-		private bool ParseCancelResign(HtmlNode tableNode, out Resignation resign)
-		{
-			resign = new Resignation();
-			//get hr code
-			if (GetTextFromCell(tableNode, 2, 1, out var hrCode))
-				resign.HRCode = hrCode;
-			else
-				throw new ArgumentException("Cant get hrCode");
-
-			//get ad
-			if (GetTextFromCell(tableNode, 3, 1, out var ad))
-				resign.ADName = ad;
-			else
-				throw new ArgumentException("Cant get Ad");
-
-			resign.ResignDay = System.Windows.Forms.DateTimePicker.MaximumDateTime;
-			resign.Status = RecordStatus.Canceled;
-			return true;
-
-		}
-		//pretty much the same with resign
-		//2,1: Hr code
-		//3,1: email
-		private bool ParseCancelCode(HtmlNode tableNode, out Resignation resign)
-		{
-			resign = new Resignation();
-			//get hr code
-			if (GetTextFromCell(tableNode, 2, 1, out var hrCode))
-				resign.HRCode = hrCode;
-			else
-				throw new ArgumentException("Cant get hrCode");
-
-			//get ad
-			if (GetTextFromCell(tableNode, 3, 1, out var ad))
-				resign.ADName = ad;
-			else
-				throw new ArgumentException("Cant get Ad");
-
-			resign.Status = RecordStatus.Ready;
-			resign.ResignDay = DateTime.Today;
-			return true;
-		}
-
+		
 		//clean string here
 		private bool GetTextFromCell(HtmlNode tableNode, int rowIndex, int colIndex, out string innerText)
 		{
@@ -272,57 +270,55 @@ namespace ResignAccountHandlerUI
 			HtmlNode table;
 			tableNode = null;
 
-			var t = FormType.NotSet;
-			var lastestEmailContent = GetLastestEmail(html);
+			var formType = FormType.NotSet;
+            //get only latest email
+			string lastestEmailContent = GetLastestEmail(html);
 			var doc = new HtmlDocument();
 			doc.LoadHtml(lastestEmailContent);
-			if (FindRegconizeText(doc, out table, new string[] { RegcognizeTextResignForm_1, RegcognizeTextResignForm_2 }))
+            //normal resign
+			if (FindRegconizeText(doc, out table, RegcognizeTextResignForm_1, RegcognizeTextResignForm_2))
 			{
-				t |= FormType.Resign;
-				tableNode = table;
-
-			}
-			if(FindRegconizeText(doc, out table, new string[] { RegcognizeTextCancelCode }))
-			{
-				t |= FormType.CancelCode;
+				formType |= FormType.Resign;
 				tableNode = table;
 			}
-			if(FindRegconizeText(doc, out table, new string[] { RegcognizeTextCancelResign }))
+            //cancel job offer
+			if(FindRegconizeText(doc, out table, RegcognizeTextCancelCode))
 			{
-				t |= FormType.CancelResign;
+				formType |= FormType.CancelCode;
+				tableNode = table;
+			}
+            //cancel resign
+			if(FindRegconizeText(doc, out table, RegcognizeTextCancelResign))
+			{
+				formType |= FormType.CancelResign;
 				tableNode = table;
 			}
 			//not ok to have 2 valid flags
-			if (t.HasMoreThanOneFlag())
+			if (formType.HasMoreThanOneFlag())
 				throw new InvalidOperationException("Form matched multiple types.");
 			//check if any flags been set
-			if ((t & (FormType.CancelCode | FormType.CancelResign | FormType.Resign | FormType.Unknown)) == 0)
+			if ((formType & (FormType.CancelCode | FormType.CancelResign | FormType.Resign | FormType.Unknown)) == 0)
 			{
-				t = FormType.Unknown;
+				formType = FormType.Unknown;
 			}
 			else //valid -> check table rows
 			{
-				if(!GetTableRowSpec(t).Contains(TableRowCount(tableNode)))
+				if(!GetTableRowSpec(formType).Contains(TableRowCount(tableNode)))
 					throw new InvalidOperationException("Form row count is not correct.");
 			}
 
-			return t;
+			return formType;
 		}   
-		private static int[] GetTableRowSpec(FormType t)
+		private static IEnumerable<int> GetTableRowSpec(FormType t)
 		{
 			switch (t)
 			{
-				case FormType.NotSet:
-					throw new InvalidProgramException();
-				case FormType.Unknown:
-					throw new InvalidProgramException(); ;
 				case FormType.Resign:
-                    return new int[] { 11, 13 };
-
+                    return new[] { 11, 13 };
 				case FormType.CancelCode:
-                    return new int[] { 4 };
+                    return new[] { 4 };
                 case FormType.CancelResign:
-                    return new int[] { 5 };
+                    return new[] { 5 };
                 default:
 					throw new InvalidProgramException();
 			}
@@ -338,11 +334,10 @@ namespace ResignAccountHandlerUI
 		private string GetLastestEmail(string mailHtml)
 		{
 			string[] array = new string[0];
-			string[] temp;
-			foreach (var sep in Seperators)
+		    foreach (string sep in Seperators)
 			{
-				temp = SplitByString(mailHtml, sep);
-				if(temp.Count() > array.Count())
+			    var temp = SplitByString(mailHtml, sep);
+			    if(temp.Count() > array.Count())
 				{
 					array = temp;
 				}
@@ -351,10 +346,8 @@ namespace ResignAccountHandlerUI
 		}
 		private int TableRowCount(HtmlNode table)
 		{
-			if (table == null) return 0;
-			var tr = table.SelectNodes(".//tr");
-			if (tr == null) return 0;
-			return tr.Count;
+		    var tr = table?.SelectNodes(".//tr");
+			return tr?.Count ?? 0;
 		}
 		private bool FindRegconizeText(HtmlDocument doc, out HtmlNode tableNode, params string[] regz)
 		{
