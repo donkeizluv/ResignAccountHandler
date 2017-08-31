@@ -7,6 +7,7 @@ using ResignAccountHandlerUI.Automation;
 using ResignAccountHandlerUI.Log;
 using ResignAccountHandlerUI.Logger;
 using ResignAccountHandlerUI.Model;
+using System.Management.Automation.Runspaces;
 
 namespace ResignAccountHandlerUI.AdExecutioner
 {
@@ -121,9 +122,10 @@ namespace ResignAccountHandlerUI.AdExecutioner
         private bool SetAutoReply(string alias, out Exception ex)
         {
             ex = null;
+            Pipeline pipe = null;
             try
             {
-                var pipe = _psWrapper.GetAutoReplyPipe_V1(alias, AutoReplyString);
+                pipe = _psWrapper.GetAutoReplyPipe_V1(alias, AutoReplyString);
                 var results = pipe.Invoke();
                 if (pipe.Error.Count > 0) //check if executed OK
                 {
@@ -145,7 +147,21 @@ namespace ResignAccountHandlerUI.AdExecutioner
                 ex = e;
                 return false;
             }
+            finally
+            {
+                CleanUpPipe(pipe);
+            }
         }
+
+        private void CleanUpPipe(Pipeline pipe)
+        {
+            try
+            {
+                pipe?.Runspace.Close();
+            }
+            catch (Exception) { }
+        }
+
         public bool DeleteAccountAndMailbox(Resignation resign, out string errorMess)
         {
             throw new NotImplementedException();
