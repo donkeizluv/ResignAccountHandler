@@ -17,18 +17,18 @@ namespace ResignAccountHandlerUI.AdExecutioner
             Password = pwd;
         }
         //works!
-        public Collection<PSObject> RemoveMailboxAndAd(string adName)
-        {
-            var runspace = GetExchangeRunspace(Username, Password);
-            runspace.Open();
-            var pipe = runspace.CreatePipeline();
-            var cmd = new Command("Remove-Mailbox");
-            cmd.Parameters.Add("Identity", adName);
-            cmd.Parameters.Add("Permanent", true);
-            cmd.Parameters.Add("Confirm", false);
-            pipe.Commands.Add(cmd);
-            return pipe.Invoke();
-        }
+        //public Collection<PSObject> RemoveMailboxAndAd(string adName)
+        //{
+        //    var runspace = GetExchangeRunspace(Username, Password);
+        //    runspace.Open();
+        //    var pipe = runspace.CreatePipeline();
+        //    var cmd = new Command("Remove-Mailbox");
+        //    cmd.Parameters.Add("Identity", adName);
+        //    cmd.Parameters.Add("Permanent", true);
+        //    cmd.Parameters.Add("Confirm", false);
+        //    pipe.Commands.Add(cmd);
+        //    return pipe.Invoke();
+        //}
         //works!
         public Pipeline GetAutoReplyPipe_V1(string alias, string content)
         {
@@ -43,6 +43,34 @@ namespace ResignAccountHandlerUI.AdExecutioner
             builder.Append($" -InternalMessage \"{content}\"");
             builder.Append($" -ExternalMessage \"{content}\"");
             var cmd = new Command(builder.ToString(), true);
+            pipe.Commands.Add(cmd);
+            return pipe;
+        }
+
+        public Pipeline SetRecipientLimits(string identity, int limit)
+        {
+            var runspace = GetExchangeRunspace(Username, Password);
+            runspace.Open();
+            var pipe = runspace.CreatePipeline();
+            var cmd = new Command("Set-Mailbox");
+            cmd.Parameters.Add("Identity", identity);
+            cmd.Parameters.Add("RecipientLimits", limit);
+            pipe.Commands.Add(cmd);
+            return pipe;
+        }
+
+        public Pipeline SetMailProtocols(string identity, bool enable)
+        {
+            var runspace = GetExchangeRunspace(Username, Password);
+            runspace.Open();
+            var pipe = runspace.CreatePipeline();
+            var cmd = new Command("Set-CASMailbox");
+            cmd.Parameters.Add("Identity", identity);
+            cmd.Parameters.Add("OWAEnabled", enable);
+            cmd.Parameters.Add("ActiveSyncEnabled", enable);
+            cmd.Parameters.Add("PopEnabled", enable);
+            cmd.Parameters.Add("ImapEnabled", enable);
+            cmd.Parameters.Add("MapiEnabled", enable);
             pipe.Commands.Add(cmd);
             return pipe;
         }
