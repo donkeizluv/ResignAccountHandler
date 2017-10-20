@@ -15,6 +15,10 @@ namespace ResignAccountHandlerUI.Logic
         public IDbAdapter Adapter { get; set; }
         public int DeleteAccountAfter { get; set; }
 
+        //fail safe list for ignoring deletion of just added cases
+        public List<Resignation> IngoreList { get; set; }
+        public bool DeleteFailSafe { get; set; } = true;
+
         public BussiessLogic(IDbAdapter adapter, int deleteAfter)
         {
             DeleteAccountAfter = deleteAfter;
@@ -27,7 +31,8 @@ namespace ResignAccountHandlerUI.Logic
         public IEnumerable<Resignation> GetTodayDeletes()
         {
             return from rec in Adapter.GetRecords(RecordStatus.Disabled)
-                   where (DateTime.Today - rec.ResignDay).TotalDays >= DeleteAccountAfter
+                   where (DateTime.Today - rec.ResignDay).TotalDays >= DeleteAccountAfter && 
+                         (DeleteFailSafe && IngoreList.FirstOrDefault(r => string.Compare(r.ADName, rec.ADName, true) == 0) == null)
                    select rec;
         }
 

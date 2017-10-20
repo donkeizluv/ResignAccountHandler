@@ -250,7 +250,7 @@ namespace ResignAccountHandlerUI.ResignExtractor
                     if (tdNodes == null || tdNodes.Count < 1) continue;
                     foreach (var td in tdNodes)
                     {
-                        if (CleanString(td.InnerText).IndexOf(CleanString(label), option) >= 0)
+                        if (string.Compare(CleanString(td.InnerText.ToLower()), CleanString(label.ToLower())) == 0)
                         {
                             var nextNode = NextNonTextNode(td);
                             if (nextNode == null) return false;
@@ -341,7 +341,7 @@ namespace ResignAccountHandlerUI.ResignExtractor
 			switch (t)
 			{
 				case FormType.Resign:
-                    return new[] { 11, 13 };
+                    return new[] { 13, 20 };
 				case FormType.CancelCode:
                     return new[] { 4 };
                 case FormType.CancelResign:

@@ -231,14 +231,17 @@ namespace ResignAccountHandlerUI.Automation
                     switch (dbResult)
                     {
                         case DbResult.Insert:
+                            Logic.IngoreList.Add(resign);
                             UpdateResults.Add(MakeRow(email.Subject, 
                                 email.Date.DateTime.ToString(DateStringFormat),
                                 resign.ResignDay.ToString(DateStringFormat),
                                 dbResult.ToString(), 
                                 Code.I.ToString()));
+                            
                             break;
 
                         case DbResult.Update:
+                            Logic.IngoreList.Add(resign);
                             UpdateResults.Add(MakeRow(email.Subject, 
                                 email.Date.DateTime.ToString(DateStringFormat),
                                 resign.ResignDay.ToString(DateStringFormat),
