@@ -36,7 +36,7 @@ namespace ResignAccountHandlerUI.AdExecutioner
 
         public bool ContainsAutoToken(DirectoryEntry entry)
         {
-            return false;
+            return true;
         }
 
         public string AutoReplyString { get; set; }

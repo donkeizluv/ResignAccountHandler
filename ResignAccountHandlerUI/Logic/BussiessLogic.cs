@@ -16,10 +16,16 @@ namespace ResignAccountHandlerUI.Logic
         public int DeleteAccountAfter { get; set; }
 
         //fail safe list for ignoring deletion of just added cases
-        public List<Resignation> IngoreList { get; set; }
-        public bool DeleteFailSafe { get; set; } = true;
+        public List<Resignation> IgnoreList { get; set; }
+        public bool DeleteFailSafe { get; set; }
 
-        public BussiessLogic(IDbAdapter adapter, int deleteAfter)
+        public BussiessLogic()
+        {
+            IgnoreList = new List<Resignation>();
+            DeleteFailSafe = true;
+        }
+
+        public BussiessLogic(IDbAdapter adapter, int deleteAfter) : this()
         {
             DeleteAccountAfter = deleteAfter;
             Adapter = adapter;
@@ -32,7 +38,7 @@ namespace ResignAccountHandlerUI.Logic
         {
             return from rec in Adapter.GetRecords(RecordStatus.Disabled)
                    where (DateTime.Today - rec.ResignDay).TotalDays >= DeleteAccountAfter && 
-                         (DeleteFailSafe && IngoreList.FirstOrDefault(r => string.Compare(r.ADName, rec.ADName, true) == 0) == null)
+                         (DeleteFailSafe && IgnoreList.FirstOrDefault(r => string.Compare(r.ADName, rec.ADName, true) == 0) == null)
                    select rec;
         }
 

@@ -231,7 +231,7 @@ namespace ResignAccountHandlerUI.Automation
                     switch (dbResult)
                     {
                         case DbResult.Insert:
-                            Logic.IngoreList.Add(resign);
+                            Logic.IgnoreList.Add(resign);
                             UpdateResults.Add(MakeRow(email.Subject, 
                                 email.Date.DateTime.ToString(DateStringFormat),
                                 resign.ResignDay.ToString(DateStringFormat),
@@ -241,7 +241,7 @@ namespace ResignAccountHandlerUI.Automation
                             break;
 
                         case DbResult.Update:
-                            Logic.IngoreList.Add(resign);
+                            Logic.IgnoreList.Add(resign);
                             UpdateResults.Add(MakeRow(email.Subject, 
                                 email.Date.DateTime.ToString(DateStringFormat),
                                 resign.ResignDay.ToString(DateStringFormat),

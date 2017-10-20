@@ -88,7 +88,7 @@ namespace ResignAccountHandlerUI.ResignExtractor
 		{
 			try
 			{
-				var t = DetermindFormType(html, out var tableNode);
+				var t = DetermineFormType(html, out var tableNode);
 				if (ParseResignInfo(tableNode, t, out resign, out errorMess))
 				{
 					return ParseResult.OK;
@@ -291,8 +291,7 @@ namespace ResignAccountHandlerUI.ResignExtractor
             }
         }
 
-		//kind of unessesary, but lol i like flags
-		private FormType DetermindFormType(string html, out HtmlNode tableNode)
+		private FormType DetermineFormType(string html, out HtmlNode tableNode)
 		{
 			HtmlNode table;
 			tableNode = null;
