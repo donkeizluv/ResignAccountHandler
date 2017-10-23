@@ -12,8 +12,18 @@ namespace ResignAccountHandlerUI.Model
         public DateTime ReceiveDate { get; set; } //set by ResignInfoExtractor
         public RecordStatus Status { get; set; } //undetermined
 
+        public string Manager { get; set; } //for autoreply purposes
+
         public string ErrorMessage { get; private set; } //AppendErrorMessage method
-        //public string Contact { get; set; }
+
+        //public Resignation()
+        //{
+        //    Manager = string.Empty;
+        //    ManagerEmail = string.Empty;
+        //}
+
+
+
         public void SetErrorMessage(string mess) //update purpose
         {
             ErrorMessage = mess;
@@ -30,8 +40,8 @@ namespace ResignAccountHandlerUI.Model
         //update editor acordingly
         public string[] ToArray(bool skipErorrMessage = true)
         {
-            return new string[] {Id.ToString(), ADName.ToString(), ResignDay.ToString("dd/MM/yyyy hh:mm:ss tt"), HRCode.ToString(),
-                ReceiveDate.ToString("dd/MM/yyyy hh:mm:ss tt"), Status.ToString(), skipErorrMessage? null : ErrorMessage};
+            return new string[] {Id.ToString(), ADName, ResignDay.ToString("dd/MM/yyyy hh:mm:ss tt"), HRCode,
+                ReceiveDate.ToString("dd/MM/yyyy hh:mm:ss tt"), Status.ToString(), Manager, skipErorrMessage? null : ErrorMessage};
         }
     }
 }

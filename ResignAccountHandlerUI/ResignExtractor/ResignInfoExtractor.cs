@@ -166,6 +166,11 @@ namespace ResignAccountHandlerUI.ResignExtractor
             GetCellContent(tableNode, "ngày nghỉ việc:", true, out var resignDate);
             if (string.IsNullOrEmpty(resignDate))
                 throw new ArgumentException("Cant get RESIGN DATE");
+
+            //get manager name
+            GetCellContent(tableNode, "Quản lý trực tiếp:", true, out var managerName);
+            resign.Manager = managerName;
+
             resign.ResignDay = ParseToDatetime(resignDate);
 
             resign.Status = RecordStatus.Ready;
@@ -213,6 +218,19 @@ namespace ResignAccountHandlerUI.ResignExtractor
 
         private static DateTime ParseToDatetime(string datetimeText)
         {
+            string FixDateText(string date)
+            {
+                string AddZero(string s)
+                {
+                    return s.Length < 2 ? $"0{s}" : s;
+                }
+                var split = date.Replace(@"//", @"/").Split('/');
+                if (split.Count() != 3) return date; //invalid
+                split[0] = AddZero(split[0]);
+                split[1] = AddZero(split[1]);
+                return string.Join("/", split);
+            }
+
             if (DateTime.TryParseExact(FixDateText(datetimeText),
                 @"dd/MM/yyyy",
                 CultureInfo.InvariantCulture,
@@ -223,18 +241,6 @@ namespace ResignAccountHandlerUI.ResignExtractor
             }
             throw new ArgumentException("Cant parse resign text to Date.");
         }
-		private static string FixDateText(string date)
-		{
-			string AddZero(string s)
-			{
-			    return s.Length < 2 ? $"0{s}" : s;
-			}
-			var split = date.Replace(@"//", @"/").Split('/');
-			if (split.Count() != 3) return date; //invalid
-			split[0] = AddZero(split[0]);
-			split[1] = AddZero(split[1]);
-			return string.Join("/", split);
-		}
 		
         private bool GetCellContent(HtmlNode tableNode, string label, bool caseInsensitive, out string innerText)
         {

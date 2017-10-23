@@ -8,25 +8,11 @@ using ResignAccountHandlerUI.Log;
 using ResignAccountHandlerUI.Logger;
 using ResignAccountHandlerUI.Model;
 using System.Management.Automation.Runspaces;
+using System.Collections.Generic;
 
 namespace ResignAccountHandlerUI.AdExecutioner
 {
-    public interface IExecutioner
-    {
-        bool DisableAccount(Resignation resign, out string errorMess);
-
-        bool DeleteAccountAndMailbox(Resignation resign, out string errorMess);
-
-        bool DeleteAccount(Resignation resign, out string errorMess);
-
-        bool ContainsAutoToken(DirectoryEntry entry);
-
-        string AutoReplyString { get; set; }
-
-        bool SetMailBoxAutoReply { get; set; }
-
-        AdController Ad { get; set; }
-    }
+   
 
     public class Executioner : IExecutioner
     {
@@ -37,7 +23,7 @@ namespace ResignAccountHandlerUI.AdExecutioner
             get { return _autoReplyString; }
             set { _autoReplyString = value; }
         }
-
+        public Dictionary<string, string> ManagerDictionary { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         private bool _setMailBoxAutoReply;
@@ -55,7 +41,11 @@ namespace ResignAccountHandlerUI.AdExecutioner
         }
 
         public const string AutoToken = "[auto_resign_token]"; //auto token
+        private const string ContactToken = "{Contact}";
+
         public AdController Ad { get; set; }
+        public string AutoReplyStringWithContact { get; set; }
+
         private ILogger _logger = LogManager.GetLogger(typeof(ResignAccountHandlerAutomation));
 
         public Executioner(string adm, string pwd)
@@ -71,6 +61,10 @@ namespace ResignAccountHandlerUI.AdExecutioner
             {
                 throw;
             }
+        }
+
+        public Executioner()
+        {
         }
 
         private DirectoryEntry GetEntry(string ad)
@@ -117,11 +111,15 @@ namespace ResignAccountHandlerUI.AdExecutioner
                 _logger.Log("DisableMailProtocols failed.");
                 _logger.Log(autoRepEx);
             }
-
-            if (!ExecuteWrapper(_psWrapper.GetAutoReplyPipe_V1(resign.ADName, AutoReplyString), out var limitEx))
+            //auto reply
+            string autoReply = ComposeAutoReplyString(resign);
+            if(!string.IsNullOrEmpty(autoReply))
             {
-                _logger.Log("SetAutoReply failed.");
-                _logger.Log(limitEx);
+                if (!ExecuteWrapper(_psWrapper.GetAutoReplyPipe_V1(resign.ADName, autoReply), out var limitEx))
+                {
+                    _logger.Log("SetAutoReply failed.");
+                    _logger.Log(limitEx);
+                }
             }
             return Ad.DisableUserAccount(entry, out errorMess);
         }
@@ -156,7 +154,16 @@ namespace ResignAccountHandlerUI.AdExecutioner
                 CleanUpPipe(pipe);
             }
         }
-
+        private string ComposeAutoReplyString(Resignation resign)
+        {
+            if (ManagerDictionary == null) return null;
+            if(ManagerDictionary.ContainsKey(resign.Manager.ToLower()))
+            {
+                return AutoReplyStringWithContact.Replace(ContactToken, ManagerDictionary[resign.Manager.ToLower()]);
+            }
+            _logger.Log($"Manager: {resign.Manager} doesnt have contact info -> Use default reply");
+            return AutoReplyString;
+        }
         private void CleanUpPipe(Pipeline pipe)
         {
             try

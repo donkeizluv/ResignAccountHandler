@@ -1,0 +1,23 @@
+﻿Name;Email
+Bùi Diễm My;bui.diem-my@hdsaison.com.vn
+Đàm Thế Thái;dam.the-thai@hdsaison.com.vn
+Đào Đức Luân;dao.duc-luan@hdsaison.com.vn
+Đào Thị Hồng Trinh;dao.hong-trinh@hdsaison.com.vn
+Huỳnh Hải Triều;huynh.hai-trieu@hdsaison.com.vn
+Huỳnh Minh Hiền;huynh.minh-hien@hdsaison.com.vn
+Lâm Hồng Ngọc;lam.hong-ngoc@hdsaison.com.vn
+Lê Phước Hiệp;le.phuoc-hiep@hdsaison.com.vn
+Lê Thế Minh;le.the-minh@hdsaison.com.vn
+Nguyễn Hữu Nhân;nguyen.huu-nhan@hdsaison.com.vn
+Nguyễn Lập Nguyên;nguyen.lap-nguyen@hdsaison.com.vn
+Nguyễn Quang Đông;nguyen.quang-dong@hdsaison.com.vn
+Nguyễn Thùy Linh;nguyen.thuy-linh13@hdsaison.com.vn
+Phạm Gia Hưng;pham.gia-hung@hdsaison.com.vn
+Phạm Phùng Vũ Quân;pham.vu-quan@hdsaison.com.vn
+Phạm Thị Hà Linh;pham.ha-linh@hdsaison.com.vn
+Phan Thái Như Quỳnh;phan.nhu-quynh@hdsaison.com.vn
+Tiền Ngọc Tú Uyên;tien.tu-uyen@hdsaison.com.vn
+Trần Nguyễn Kim Khánh;tran.kim-khanh@hdsaison.com.vn
+Trần Thị Thiên Thanh;tran.thien-thanh@hdsaison.com.vn
+Trịnh Trung Kiên;trinh.trung-kien1@hdsaison.com.vn
+Võ Ngọc Trường;vo.ngoc-truong@hdsaison.com.vn

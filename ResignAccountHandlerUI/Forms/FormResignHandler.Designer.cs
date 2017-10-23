@@ -83,6 +83,7 @@
             this.dataGridViewTextBoxColumn14 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewTextBoxColumn15 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridViewStatusColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColumnManager = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.erorrMessageColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl1.SuspendLayout();
             this.tabPageUpdate.SuspendLayout();
@@ -111,7 +112,7 @@
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(754, 580);
-            this.tabControl1.TabIndex = 0;
+            this.tabControl1.TabIndex = 3;
             // 
             // tabPageUpdate
             // 
@@ -632,6 +633,7 @@
             this.dataGridViewTextBoxColumn14,
             this.dataGridViewTextBoxColumn15,
             this.dataGridViewStatusColumn,
+            this.ColumnManager,
             this.erorrMessageColumn});
             this.dataGridViewQuery.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dataGridViewQuery.Location = new System.Drawing.Point(2, 50);
@@ -692,6 +694,12 @@
             this.dataGridViewStatusColumn.Name = "dataGridViewStatusColumn";
             this.dataGridViewStatusColumn.ReadOnly = true;
             this.dataGridViewStatusColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            // 
+            // ColumnManager
+            // 
+            this.ColumnManager.HeaderText = "Manager";
+            this.ColumnManager.Name = "ColumnManager";
+            this.ColumnManager.ReadOnly = true;
             // 
             // erorrMessageColumn
             // 
@@ -778,16 +786,17 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn actionResultColumnDelete;
         private System.Windows.Forms.Button buttonDeleteRecord;
         private System.Windows.Forms.Button buttonUpdateRecord;
+        private System.Windows.Forms.TextBox textBoxFilterAd;
+        private System.Windows.Forms.RadioButton radioButtonFilterStatus;
+        private System.Windows.Forms.RadioButton radioButtonFilterAd;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn11;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn12;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn13;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn14;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn15;
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewStatusColumn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnManager;
         private System.Windows.Forms.DataGridViewTextBoxColumn erorrMessageColumn;
-        private System.Windows.Forms.TextBox textBoxFilterAd;
-        private System.Windows.Forms.RadioButton radioButtonFilterStatus;
-        private System.Windows.Forms.RadioButton radioButtonFilterAd;
     }
 }
 

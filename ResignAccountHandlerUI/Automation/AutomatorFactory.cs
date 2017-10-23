@@ -8,35 +8,6 @@ using System.Linq;
 
 namespace ResignAccountHandlerUI.Automation
 {
-    public class AutomatorConfig
-    {
-        public bool SendReport;
-        //public string SenderEmailSuffix;
-        public string ResignFolderName;
-        public string ProcessedFolderName;
-        public bool MoveToProcessedFolder;
-        public IEnumerable<Tuple<string, string>> AcceptedResignSenders;
-        //set mailbox auto reply
-        public string AutoReplyString { get; set; }
-        public bool SetMailBoxAutoReply { get; set; }
-        //public IDbAdapter Adapter;
-        public IEmailHandler EmailHandler;
-
-        public IExecutioner Executioner;
-        public string[] ReportCC;
-        public string[] ReportReceiver;
-        public BussiessLogic Logic;
-        public int DeleteAfter;
-        public int ReadEmailRetry;
-        public int SendReportRetry;
-
-
-        public IEnumerable<MailboxAddress> GetAcceptedResignSenders()
-        {
-            return AcceptedResignSenders.Select(item => new MailboxAddress(item.Item1, item.Item2));
-        }
-    }
-
     public static class AutomatorFactory
     {
         public static string GetDbPath()
@@ -44,14 +15,14 @@ namespace ResignAccountHandlerUI.Automation
             return $@"{Program.AssemblyDirectory}\db.dat";
         }
 
-        public static ResignAccountHandlerAutomation GetAutomator(AutomatorConfig config)
+        public static ResignAccountHandlerAutomation GetAutomator(dynamic config)
         {
             var automator = new ResignAccountHandlerAutomation()
             {
                 SendReport = config.SendReport,
                 //SenderEmailSuffix = config.SenderEmailSuffix,
                 ResignFolderName = config.ResignFolderName,
-                AcceptedSenders = config.GetAcceptedResignSenders(),
+                AcceptedSenders = TupleToAddressList(config.AcceptedResignSenders),
                 Adapter = new DbAdapter(GetDbPath()), //not configuarable
                 EmailHandler = config.EmailHandler,
                 Executioner = config.Executioner,
@@ -66,7 +37,10 @@ namespace ResignAccountHandlerUI.Automation
             automator.Logic = new BussiessLogic(automator.Adapter, config.DeleteAfter);
             return automator;
         }
-
+        private static List<MailboxAddress> TupleToAddressList(IEnumerable<Tuple<string, string>> acceptedSenders)
+        {
+            return acceptedSenders.Select(item => new MailboxAddress(item.Item1, item.Item2)).ToList();
+        }
         public static ResignAccountHandlerAutomation GetDebugAutomator()
         {
             var acceptedSenders = new List<MailboxAddress>
@@ -78,7 +52,7 @@ namespace ResignAccountHandlerUI.Automation
             var automator = new ResignAccountHandlerAutomation()
             {
                 SendReport = true,
-                SenderEmailSuffix = "@hdsaison.com.vn",
+                //SenderEmailSuffix = "@hdsaison.com.vn",
                 ResignFolderName = "Test",
                 AcceptedSenders = acceptedSenders,
                 Adapter = new DbAdapter(GetDbPath()),
@@ -88,7 +62,8 @@ namespace ResignAccountHandlerUI.Automation
                 ReportCC = new string[] { "luu.nhat-hong@hdsaison.com.vn" },
                 ReportReceiver = new string[] { "luu.nhat-hong@hdsaison.com.vn" },
                 ReadEmailRetry = 5,
-                SendReportRetry = 5
+                SendReportRetry = 5,
+                
             };
             automator.EmailHandler.MoveToProcessedFolder = false;
             automator.Logic = new BussiessLogic(automator.Adapter, 10);

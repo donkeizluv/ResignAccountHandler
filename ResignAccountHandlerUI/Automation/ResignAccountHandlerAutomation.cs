@@ -28,7 +28,7 @@ namespace ResignAccountHandlerUI.Automation
 
         //string Username { get; set; } //authenticate to receive/send email
         //string Password { get; set; }
-        string SenderEmailSuffix { get; set; }
+        //string SenderEmailSuffix { get; set; }
         
         string ResignFolderName { get; set; }
 
@@ -45,7 +45,6 @@ namespace ResignAccountHandlerUI.Automation
         IDbAdapter Adapter { get; set; }
         IEmailHandler EmailHandler { get; set; }
         BussiessLogic Logic { get; set; }
-
         //other prop
         List<List<string>> UpdateResults { get; }
 
@@ -81,7 +80,8 @@ namespace ResignAccountHandlerUI.Automation
 
         //public string Username { get; set; } //authenticate to receive/send email
         //public string Password { get; set; }
-        public string SenderEmailSuffix { get; set; }
+        //doesnt seem to have any uses
+        //public string SenderEmailSuffix { get; set; }
         
         public string ResignFolderName { get; set; }
         //public string ProcessedFolderName { get; set; }
@@ -103,6 +103,8 @@ namespace ResignAccountHandlerUI.Automation
         public List<List<string>> DeleteResults { get; private set; }
         public int ReadEmailRetry { get; set; }
         public int SendReportRetry { get; set; }
+        public Dictionary<string, string> ManagerDictionary { get; set; }
+
         private int _readEmailTries = 1;
         private int _sendReportTries = 1;
         private const int Wait = 3;

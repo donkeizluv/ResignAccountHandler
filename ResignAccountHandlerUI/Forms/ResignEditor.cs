@@ -21,6 +21,7 @@ namespace ResignAccountHandlerUI.Forms
                 dateTimePickerResignDay.Value = value.ResignDay;
                 textBoxError.Text = value.ErrorMessage;
                 comboBoxStatus.SelectedItem = value.Status.ToString();
+                textBoxManager.Text = value.Manager;
             }
         }
 
@@ -96,6 +97,7 @@ namespace ResignAccountHandlerUI.Forms
                     ReceiveDate = dateTimePickerReceiveDay.Value,
                     ResignDay = dateTimePickerResignDay.Value,
                     Status = (RecordStatus)Enum.Parse(typeof(RecordStatus), comboBoxStatus.SelectedItem.ToString()),
+                    Manager = textBoxManager.Text
                 };
                 if (update)
                     resign.Id = _currentResign.Id;
