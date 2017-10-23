@@ -6,3 +6,5 @@ Res/
 packages/
 **/cred_config.ini
 .idea/
+
+**/SupDict/man_dict.txt
