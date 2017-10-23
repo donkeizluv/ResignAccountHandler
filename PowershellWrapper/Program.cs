@@ -12,7 +12,7 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            var exchangePs = new ExchangePowerShellWrapper("adm-hongln", "Dant@@760119");
+            var exchangePs = new ExchangePowerShellWrapper("xxxxx", "xxxxxx");
             Console.WriteLine("Enter username to enable AutoReply:");
             var username = Console.ReadLine();
             Console.WriteLine($"Attemp to set auto reply to {username}");
