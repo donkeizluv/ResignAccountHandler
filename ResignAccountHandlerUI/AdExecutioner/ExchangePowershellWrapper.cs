@@ -75,20 +75,20 @@ namespace ResignAccountHandlerUI.AdExecutioner
             return pipe;
         }
         //doesnt work
-        public PowerShell GetAutoReplyPipe_V2(string alias, string content)
-        {
-            var psExec = PowerShell.Create();
-            psExec.Runspace = GetExchangeRunspace(Username, Password);
-            var builder = new StringBuilder();
-            builder.Append("Set-MailboxAutoReplyConfiguration ");
-            builder.Append(alias);
-            builder.Append(" -AutoReplyState enabled");
-            builder.Append(" -ExternalAudience all");
-            builder.Append($" -InternalMessage \"{content}\"");
-            builder.Append($" -ExternalMessage \"{content}\"");
-            psExec.AddScript(builder.ToString()); //reads all the lines in the powershell script
-            return psExec;
-        }
+        //public PowerShell GetAutoReplyPipe_V2(string alias, string content)
+        //{
+        //    var psExec = PowerShell.Create();
+        //    psExec.Runspace = GetExchangeRunspace(Username, Password);
+        //    var builder = new StringBuilder();
+        //    builder.Append("Set-MailboxAutoReplyConfiguration ");
+        //    builder.Append(alias);
+        //    builder.Append(" -AutoReplyState enabled");
+        //    builder.Append(" -ExternalAudience all");
+        //    builder.Append($" -InternalMessage \"{content}\"");
+        //    builder.Append($" -ExternalMessage \"{content}\"");
+        //    psExec.AddScript(builder.ToString()); //reads all the lines in the powershell script
+        //    return psExec;
+        //}
 
         private static Runspace GetExchangeRunspace(string username, string pwd)
         {

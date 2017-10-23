@@ -1,6 +1,1 @@
-﻿Bug:
-
-
-
-NYI:
-- log report email as html to manually sent in case shit happen
+﻿

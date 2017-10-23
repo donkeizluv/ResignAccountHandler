@@ -47,8 +47,6 @@ namespace ResignAccountHandlerUI.Automation
             ProcessedFolderName = processedFolder;
         }
 
-        //public virtual string Pop3MailServer { get; set; }
-        //public virtual int Pop3Port { get; set; } = 995;
         public virtual string SmtpMailServer { get; set; } = "mail.hdsaison.com.vn";
         //public virtual string ImapMailServer { get; set; } = "prd-vn-mail05.sgvf.sgcf"; //faster than mail.hdsaison.com.vn
         public virtual string ImapMailServer { get; set; } = "mail.hdsaison.com.vn";
@@ -186,7 +184,6 @@ namespace ResignAccountHandlerUI.Automation
         {
             using (var client = new SmtpClient())
             {
-                // For demo-purposes, accept all SSL certificates
                 client.Timeout = SmptpTimeout;
                 client.ServerCertificateValidationCallback = (s, c, h, e) => true;
                 client.Connect(SmtpMailServer, SmtpPort, false);

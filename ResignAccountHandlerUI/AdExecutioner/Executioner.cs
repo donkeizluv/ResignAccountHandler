@@ -54,7 +54,7 @@ namespace ResignAccountHandlerUI.AdExecutioner
             }
         }
 
-        public const string AutoToken = "[auto_resign_token]"; //mark for delete, if account is not mark then -> token erorr
+        public const string AutoToken = "[auto_resign_token]"; //auto token
         public AdController Ad { get; set; }
         private ILogger _logger = LogManager.GetLogger(typeof(ResignAccountHandlerAutomation));
 
@@ -110,71 +110,35 @@ namespace ResignAccountHandlerUI.AdExecutioner
                 description, AutoToken, 
                 resign.ResignDay.ToShortDateString()),
                 out string setDescriptionError);
-            //set auto reply
-            //alias allows @...
-            if(!SetAutoReply(resign.ADName, out var autoRepEx))
+
+            //Exchange auto reply, protocols
+            if (!ExecuteWrapper(_psWrapper.SetMailProtocols(resign.ADName, false), out var autoRepEx))
             {
-                _logger.Log("SetAutoReply failed.");
+                _logger.Log("DisableMailProtocols failed.");
                 _logger.Log(autoRepEx);
             }
 
-            if (!DisableMailProtocols(resign.ADName, out var limitEx))
+            if (!ExecuteWrapper(_psWrapper.GetAutoReplyPipe_V1(resign.ADName, AutoReplyString), out var limitEx))
             {
-                _logger.Log("DisableMailProtocols failed.");
+                _logger.Log("SetAutoReply failed.");
                 _logger.Log(limitEx);
             }
             return Ad.DisableUserAccount(entry, out errorMess);
         }
         //merge this into 1 method
-        private bool DisableMailProtocols(string alias, out Exception ex)
+        private bool ExecuteWrapper(Pipeline pipe, out Exception ex)
         {
             ex = null;
-            Pipeline pipe = null;
             try
             {
-                pipe = _psWrapper.SetMailProtocols(alias, false);
                 var results = pipe.Invoke();
                 if (pipe.Error.Count > 0) //check if executed OK
                 {
-                    var error = pipe.Error.Read() as Collection<ErrorRecord>;
-                    if (error != null)
+                    if (pipe.Error.Read() is Collection<ErrorRecord> error)
                     {
                         foreach (var er in error)
                         {
                             _logger.Log($"[PowerShell Error]: {er.Exception.Message}");
-                        }
-                        return false;
-                    }
-                }
-                //OK
-                return true;
-            }
-            catch (Exception e)
-            {
-                ex = e;
-                return false;
-            }
-            finally
-            {
-                CleanUpPipe(pipe);
-            }
-        }
-        private bool SetAutoReply(string alias, out Exception ex)
-        {
-            ex = null;
-            Pipeline pipe = null;
-            try
-            {
-                pipe = _psWrapper.GetAutoReplyPipe_V1(alias, AutoReplyString);
-                var results = pipe.Invoke();
-                if (pipe.Error.Count > 0) //check if executed OK
-                {
-                    var error = pipe.Error.Read() as Collection<ErrorRecord>;
-                    if (error != null)
-                    {
-                        foreach (var er in error)
-                        {
-                           _logger.Log($"[PowerShell Error]: {er.Exception.Message}");
                         }
                         return false;
                     }
