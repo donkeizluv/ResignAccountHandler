@@ -71,9 +71,10 @@ namespace ResignAccountHandlerConsole
                 //db adapter
                 //Adapter = new DbAdapter($@"{Program.AssemblyDirectory}\db.dat"), //not configureable
                 //Executioner
+                var manDict = GetManDict(manDictFilename);
                 Executioner = executioner == string.Empty ?
-                (IExecutioner)new MockExecutioner() { ManagerDictionary = GetManDict(manDictFilename) } : 
-                new Executioner(executioner.Split(':').First(), executioner.Split(':').Last()) { ManagerDictionary = GetManDict(manDictFilename) };
+                (IExecutioner)new MockExecutioner() { ManagerDictionary = manDict } : 
+                new Executioner(executioner.Split(':').First(), executioner.Split(':').Last()) { ManagerDictionary = manDict };
                 //Policy
                 DeleteAfter = sectionPolicy["DeleteAccountAfter"].IntValue;
 

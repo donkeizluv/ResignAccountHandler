@@ -329,6 +329,7 @@ namespace ResignAccountHandlerUI.Automation
         public void Run()
         {
             if (IsCompleted) throw new InvalidOperationException("Automator already run, create new Automator");
+            _logger.Log($"Contact dict entries: {Executioner.ManagerDictionary.Count}");
             _logger.Log($"Begin reading folder: {ResignFolderName}");
             var readEmailPol = GetReadMailFolderRetryPolicy();
             var emailList = readEmailPol.Execute(() => EmailHandler.GetImapEmail(ResignFolderName, AcceptedSenders));
