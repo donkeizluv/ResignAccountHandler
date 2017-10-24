@@ -156,7 +156,11 @@ namespace ResignAccountHandlerUI.AdExecutioner
         }
         private string ComposeAutoReplyString(Resignation resign)
         {
-            if (ManagerDictionary == null) return null;
+            if (ManagerDictionary == null || string.IsNullOrEmpty(resign.Manager))
+            {
+                _logger.Log($"Resign index: {resign.Id} doesnt have Contact info -> Use default reply");
+                return AutoReplyString;
+            }
             if(ManagerDictionary.ContainsKey(resign.Manager.ToLower()))
             {
                 return AutoReplyStringWithContact.Replace(ContactToken, ManagerDictionary[resign.Manager.ToLower()]);
