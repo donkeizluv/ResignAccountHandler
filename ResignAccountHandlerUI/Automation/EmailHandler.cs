@@ -189,7 +189,8 @@ namespace ResignAccountHandlerUI.Automation
                 client.Connect(SmtpMailServer, SmtpPort, false);
                 client.AuthenticationMechanisms.Remove("XOAUTH2");
                 // Note: only needed if the SMTP server requires authentication
-                client.Authenticate(ReportSenderUsername, ReportSenderPassword);
+                if(!string.IsNullOrEmpty(ReportSenderPassword))
+                    client.Authenticate(ReportSenderUsername, ReportSenderPassword);
                 client.Send(email);
                 client.Disconnect(true);
             }

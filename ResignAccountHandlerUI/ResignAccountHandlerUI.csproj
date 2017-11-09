@@ -82,7 +82,6 @@
     <Compile Include="AdExecutioner\IExecutioner.cs" />
     <Compile Include="AdExecutioner\MockExecutioner.cs" />
     <Compile Include="AdHelper\ADController.cs" />
-    <Compile Include="Automation\AutomatorConfig.cs" />
     <Compile Include="Automation\AutomatorFactory.cs" />
     <Compile Include="Automation\HtmlComposer.cs" />
     <Compile Include="Automation\ReportComposer.cs" />

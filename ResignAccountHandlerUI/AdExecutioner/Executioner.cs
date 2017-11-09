@@ -163,6 +163,7 @@ namespace ResignAccountHandlerUI.AdExecutioner
             }
             if(ManagerDictionary.ContainsKey(resign.Manager.ToLower()))
             {
+                _logger.Log($"Resign index: Insert manager's contact info");
                 return AutoReplyStringWithContact.Replace(ContactToken, ManagerDictionary[resign.Manager.ToLower()]);
             }
             _logger.Log($"Manager: {resign.Manager} doesnt have contact info -> Use default reply");
