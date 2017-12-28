@@ -341,14 +341,15 @@ namespace ResignAccountHandlerUI.ResignExtractor
 
 			return formType;
 		}   
+        //make this config
 		private static IEnumerable<int> GetTableRowSpec(FormType t)
 		{
 			switch (t)
 			{
 				case FormType.Resign:
-                    return new[] { 13, 20 };
+                    return new[] { 20 };
 				case FormType.CancelCode:
-                    return new[] { 4 };
+                    return new[] { 5 };
                 case FormType.CancelResign:
                     return new[] { 5 };
                 default:

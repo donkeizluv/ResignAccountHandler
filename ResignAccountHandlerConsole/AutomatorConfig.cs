@@ -47,27 +47,27 @@ namespace ResignAccountHandlerConsole
                 var sectionPolicy = ini["Policy"];
 
 
-                var emailAuth = sectionEmailAccount["Authentication"].StringValueTrimmed.Split(':');
-                var executioner = sectionExecutioner["Authentication"].StringValueTrimmed;
+                var emailAuth = sectionEmailAccount["Authentication"].StringValue.Split(':');
+                var executioner = sectionExecutioner["Authentication"].StringValue;
                 //set mailbox auto reply
                 SetMailBoxAutoReply = sectionMailBoxAutoReply["SetMailBoxAutoReply"].BoolValue;
-                AutoReplyString = sectionMailBoxAutoReply["AutoReplyString"].StringValueTrimmed;
-                AutoReplyStringWithContactToken = sectionMailBoxAutoReply["AutoReplyStringWithContactToken"].StringValueTrimmed;
+                AutoReplyString = sectionMailBoxAutoReply["AutoReplyString"].StringValue;
+                AutoReplyStringWithContactToken = sectionMailBoxAutoReply["AutoReplyStringWithContactToken"].StringValue;
                 //report
                 SendReport = sectionReport["SendReport"].BoolValue;
                 //email account
                 //SenderEmailSuffix = nini.Configs["EmailAccount"].GetString("SenderEmailSuffix"),
                 EmailHandler = new EmailHandler(emailAuth.First(), emailAuth.Last());
-                ResignFolderName = sectionEmailAccount["ResignFolderName"].StringValueTrimmed;
-                ProcessedFolderName = sectionEmailAccount["ProcessedFolderName"].StringValueTrimmed;
+                ResignFolderName = sectionEmailAccount["ResignFolderName"].StringValue;
+                ProcessedFolderName = sectionEmailAccount["ProcessedFolderName"].StringValue;
                 MoveToProcessedFolder = sectionEmailAccount["MoveToProcessedFolder"].BoolValue;
                 ReadEmailRetry = sectionRetry["ReadEmailRetry"].IntValue;
-                ReportCC = sectionReport["ReportCC"].StringValueTrimmed.Split(',');
-                ReportReceiver = sectionReport["ReportReceiver"].StringValueTrimmed.Split(',');
+                ReportCC = sectionReport["ReportCC"].StringValue.Split(',');
+                ReportReceiver = sectionReport["ReportReceiver"].StringValue.Split(',');
                 SendReportRetry = sectionRetry["SendReportRetry"].IntValue;
 
                 //exp: luu nhat hong:luu.nhat-hong@hdsaison.com.vn,vo ya phuong khanh:vo.phuong-khanh@hd... *case insenstive
-                AcceptedResignSenders = SplitToTuple(sectionEmailAccount["AcceptedResignSenders"].StringValueTrimmed);
+                AcceptedResignSenders = SplitToTuple(sectionEmailAccount["AcceptedResignSenders"].StringValue);
                 //db adapter
                 //Adapter = new DbAdapter($@"{Program.AssemblyDirectory}\db.dat"), //not configureable
                 //Executioner
@@ -89,7 +89,7 @@ namespace ResignAccountHandlerConsole
                     Executioner.AutoReplyStringWithContact = AutoReplyStringWithContactToken;
                 }
                 //set report sender account
-                var reportAuth = sectionReport["Authentication"].StringValueTrimmed;
+                var reportAuth = sectionReport["Authentication"].StringValue;
                 if (!string.IsNullOrEmpty(reportAuth))
                 {
                     EmailHandler.ReportSenderUsername = reportAuth.Split(':').First();
