@@ -86,7 +86,7 @@ namespace ResignAccountHandlerUI.AdExecutioner
                 errorMess = $"ad: {resign.ADName} is not De-activated or does NOT have AutoToken";
                 return false;
             }
-            return Ad.DeleteUser2(entry, out errorMess);
+            return Ad.DeleteTree(entry, out errorMess);
         }
 
         //disable & put token to description

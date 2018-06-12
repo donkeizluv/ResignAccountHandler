@@ -111,8 +111,14 @@ namespace ResignAccountHandlerUI.ResignExtractor
 				errorMess = ex.Message;
 				return ParseResult.Parsed_Info_Error;
 			}
-			
-		}
+            catch (NullReferenceException ex)
+            {
+                resign = null;
+                errorMess = ex.Message;
+                return ParseResult.Parsed_Info_Error;
+            }
+
+        }
 
 		//run.SelectNodes("//div[@class='date']")
 		//Will will behave exactly like doc.DocumentNode.SelectNodes("//div[@class='date']")
@@ -304,7 +310,7 @@ namespace ResignAccountHandlerUI.ResignExtractor
 
 			var formType = FormType.NotSet;
             //get only latest email
-			string lastestEmailContent = GetLastestEmail(html);
+            var lastestEmailContent = GetLastestEmail(html);
 			var doc = new HtmlDocument();
 			doc.LoadHtml(lastestEmailContent);
             //normal resign
@@ -373,17 +379,17 @@ namespace ResignAccountHandlerUI.ResignExtractor
 
 		private string GetLastestEmail(string mailHtml)
 		{
-			string[] array = new string[0];
-		    foreach (string sep in Seperators)
-			{
-			    var temp = SplitByString(mailHtml, sep);
-			    if(temp.Count() > array.Count())
-				{
-					array = temp;
-				}
-			}
-			return array.First();
-		}
+            string[] array = new string[0];
+            foreach (string sep in Seperators)
+            {
+                var temp = SplitByString(mailHtml, sep);
+                if (temp.Count() > array.Count())
+                {
+                    array = temp;
+                }
+            }
+            return array.First();
+        }
 
 		private int TableRowCount(HtmlNode table)
 		{

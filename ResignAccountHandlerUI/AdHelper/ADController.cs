@@ -492,6 +492,20 @@ namespace ResignAccountHandlerUI.AdHelper
                 error = ex.Message;
                 return false;
             }
+        }
+        public bool DeleteTree(DirectoryEntry user, out string error)
+        {
+            error = string.Empty;
+            try
+            {
+                user.DeleteTree();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                return false;
+            }
 
 
         }
